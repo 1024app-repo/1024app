@@ -4,7 +4,7 @@ const BASE_URL = 'http://www.t66y.com';
 
 final colourLevel = {
   '論壇版主 ( 5 )': Colors.amber[900],
-  '禁止發言 ( 8 ) ': Colors.grey[500],
+  '禁止發言 ( 8 )': Colors.grey[500],
   '新手上路 ( 8 )': Colors.grey[500],
   '俠客 ( 9 )': Colors.blue[500],
   '騎士 ( 10 )': Colors.green[500],
