@@ -105,6 +105,10 @@ class API {
     document.querySelectorAll(".t.t2").forEach((v) {
       var a = v.querySelector('.r_two');
       var t = v.querySelector(".tipad");
+      // 有时可能会找不到这个 tipad 元素，就尝试去父级节点找
+      if (t == null) {
+        t = v.parent.querySelector('.tipad');
+      }
       var i = t.text.indexOf("Posted:");
 
       var u = a.querySelector(".tac > img");
