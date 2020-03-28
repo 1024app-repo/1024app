@@ -32,12 +32,15 @@ class NetworkError extends StatelessWidget {
             ),
             Container(
               margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
-              child: OutlineButton(
-                child: Text("重新加载",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w600,
-                    )),
+              child: RaisedButton(
+                color: Colors.blue,
+                child: Text(
+                  "重新加载",
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                elevation: 1.0,
                 onPressed: onPress,
               ),
             )

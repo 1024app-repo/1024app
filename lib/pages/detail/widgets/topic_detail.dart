@@ -167,7 +167,6 @@ class TopicDetailViewState extends State<TopicDetailView> {
                           ),
                         ],
                         controller: _scrollController,
-                        cacheExtent: MediaQuery.of(context).size.height,
                       ),
                       onRefresh: () async {
                         items.clear();

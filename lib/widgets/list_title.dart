@@ -25,8 +25,8 @@ class MyListTitle extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(left: 15.0),
-        padding: const EdgeInsets.fromLTRB(0, 15.0, 15.0, 15.0),
+        margin: const EdgeInsets.only(left: 20.0),
+        padding: const EdgeInsets.fromLTRB(0, 20.0, 20.0, 20.0),
         constraints:
             BoxConstraints(maxHeight: double.infinity, minHeight: 50.0),
         width: double.infinity,

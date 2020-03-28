@@ -4,6 +4,7 @@ import 'package:identicon/identicon.dart';
 import '../../api/model.dart';
 import '../../pages/detail/page/topic_detail_page.dart';
 import '../../util/db_helper.dart';
+import '../colorful_tag.dart';
 
 class TopicItemView extends StatefulWidget {
   final Topic topic;
@@ -38,13 +39,12 @@ class _TopicItemViewState extends State<TopicItemView> {
       child: Container(
         padding: const EdgeInsets.all(20),
         color: widget.topic.readTime != null
-            ? Brightness.dark == Theme.of(context).brightness
-                ? Color(0xFF222222)
-                : Color(0xFFFFFFE0)
+            ? Color(0xFFFFFFE0)
             : Colors.transparent,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            // 标题
             Text(
               widget.topic.title,
               style: TextStyle(
@@ -56,6 +56,7 @@ class _TopicItemViewState extends State<TopicItemView> {
             SizedBox(
               height: 10,
             ),
+            // 头像、作者、时间、回复数
             Row(
               children: <Widget>[
                 ClipOval(
@@ -85,55 +86,31 @@ class _TopicItemViewState extends State<TopicItemView> {
                   ),
                 ),
                 SizedBox(width: 5),
+                // 熱門
                 Offstage(
                   offstage: !widget.topic.hot,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 2.0, right: 2.0),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-                      decoration: BoxDecoration(
-                        color: Colors.redAccent[200],
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                      child: Text(
-                        '熱門',
-                        style: TextStyle(fontSize: 8, color: Colors.white),
-                      ),
-                    ),
+                  child: ColorfulTag(
+                    title: '熱門',
+                    color: Colors.redAccent[200],
+                    fontSize: 8,
                   ),
                 ),
+                // 精華
                 Offstage(
                   offstage: !widget.topic.prime,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 2.0, right: 2.0),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-                      decoration: BoxDecoration(
-                        color: Colors.purpleAccent[200],
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                      child: Text(
-                        '精華',
-                        style: TextStyle(fontSize: 8, color: Colors.white),
-                      ),
-                    ),
+                  child: ColorfulTag(
+                    title: '精華',
+                    color: Colors.purpleAccent[200],
+                    fontSize: 8,
                   ),
                 ),
+                // 置頂
                 Offstage(
                   offstage: widget.topic.publishTime != 'Top-marks',
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 2.0, right: 2.0),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-                      decoration: BoxDecoration(
-                        color: Colors.greenAccent[700],
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                      child: Text(
-                        '置頂',
-                        style: TextStyle(fontSize: 8.0, color: Colors.white),
-                      ),
-                    ),
+                  child: ColorfulTag(
+                    title: '置頂',
+                    color: Colors.greenAccent[200],
+                    fontSize: 8,
                   ),
                 ),
                 Spacer(),

@@ -6,6 +6,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import '../../api/model.dart';
 import '../../util/constants.dart';
 import '../circle_avatar.dart';
+import '../colorful_tag.dart';
 import '../html_factory.dart';
 
 class TopicSubject extends StatefulWidget {
@@ -45,8 +46,8 @@ class TopicSubjectState extends State<TopicSubject> {
                   size: 40,
                 ),
                 SizedBox(width: 10.0),
-                new Expanded(
-                  child: new Column(
+                Expanded(
+                  child: Column(
                     children: <Widget>[
                       Row(
                         children: <Widget>[
@@ -63,27 +64,17 @@ class TopicSubjectState extends State<TopicSubject> {
                           SizedBox(
                             width: 5,
                           ),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 3, vertical: 1),
-                            decoration: BoxDecoration(
-                              color: colourLevel[
-                                  widget.topic.subject.level.trim()],
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                            child: Text(
-                              widget.topic.subject.level,
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: Colors.white,
-                              ),
-                            ),
+                          ColorfulTag(
+                            title: widget.topic.subject.level,
+                            color:
+                                colourLevel[widget.topic.subject.level.trim()],
+                            fontSize: 10,
                           ),
                         ],
                       ),
                       Row(
                         children: <Widget>[
-                          new Padding(
+                          Padding(
                             padding: const EdgeInsets.only(top: 3.0),
                             child: Text(
                               widget.topic.subject.time,
