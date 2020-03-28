@@ -6,6 +6,8 @@ Flutter 开发的草榴非官方客户端，支持 Android 和 iOS
 
 
 ## ScreenShot
+<img src="https://github.com/1024community-repo/1024community/blob/master/screenshot/ScreenShot%20-%201.png" width="300" /> <img src="https://github.com/1024community-repo/1024community/blob/master/screenshot/ScreenShot%20-%202.png" width="300" />
+
 
 ## License
 
