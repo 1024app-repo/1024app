@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../widgets/app_bar.dart';
 
-class AboutPage extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => AboutPageState();
-}
-
-class AboutPageState extends State<AboutPage> {
+class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

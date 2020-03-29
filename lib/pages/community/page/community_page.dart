@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../api/model.dart';
 import '../../../widgets/app_bar.dart';
-import '../../../widgets/topic/topics.dart';
+import '../widgets/topics.dart';
 
 var nodes = [
   Node(
@@ -170,7 +170,7 @@ class CommunityPageState extends State<CommunityPage> {
     return Scaffold(
       appBar: MyAppBar(title: '社区'),
       body: Container(
-        padding: EdgeInsets.only(top: 20),
+        padding: const EdgeInsets.only(top: 20),
         child: ListView(
           children: nodes
               .map((Node v) => ListTile(

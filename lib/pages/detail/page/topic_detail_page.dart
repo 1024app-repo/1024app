@@ -7,7 +7,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../../../api/api.dart';
 import '../../../api/model.dart';
-import '../../../util/db_helper.dart';
 import '../../../widgets/app_bar.dart';
 import '../../../widgets/error/error.dart';
 import '../../../widgets/refresh_indicator.dart';
@@ -54,11 +53,6 @@ class TopicDetailPageState extends State<TopicDetailPage> {
     super.dispose();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
   Future _fetchData(int page) async {
     print(page);
     if (!loading) {
@@ -86,8 +80,10 @@ class TopicDetailPageState extends State<TopicDetailPage> {
           items.addAll(
             reverse ? res.replies.reversed.toList() : res.replies,
           );
+//          topic.readStatus = true;
           topic.total = res.total;
           topic.current = res.current;
+//          DbHelper.instance.insert(topic);
           loading = false;
         });
       }
@@ -96,8 +92,6 @@ class TopicDetailPageState extends State<TopicDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final dbHelper = DbHelper.instance;
-
     return Scaffold(
       appBar: MyAppBar(title: '详情'),
       body: hasError
@@ -165,7 +159,7 @@ class TopicDetailPageState extends State<TopicDetailPage> {
   }
 
   Widget detailCard() {
-    return TopicSubject(topic);
+    return TopicSubject(topic: topic);
   }
 
   Widget pagePersistent() {
@@ -173,12 +167,12 @@ class TopicDetailPageState extends State<TopicDetailPage> {
         ? SliverToBoxAdapter(
             child: Container(
               key: globalKey,
-              padding: EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(10.0),
               color: Colors.grey[200],
               child: Center(
                 child: Text(
                   '目前尚无回复',
-                  style: new TextStyle(color: Colors.grey[600]),
+                  style: TextStyle(color: Colors.grey[600]),
                 ),
               ),
             ),
@@ -195,7 +189,7 @@ class TopicDetailPageState extends State<TopicDetailPage> {
                 alignment: Alignment.centerLeft,
                 child: Row(children: <Widget>[
                   Text('页码 ${topic.current} / ${topic.total}'),
-                  Spacer(),
+                  const Spacer(),
                   RaisedButton(
                     color: Colors.grey[200],
                     splashColor: Colors.transparent,
@@ -245,15 +239,18 @@ class TopicDetailPageState extends State<TopicDetailPage> {
           Reply comment = items[index];
           if (index == 0) {
             return TopicReply(
-              comment,
-              topic.author == comment.author,
               key: globalKey,
+              reply: comment,
+              isAuthor: topic.author == comment.author,
             );
           }
-          return TopicReply(comment, topic.author == comment.author);
+          return TopicReply(
+            reply: comment,
+            isAuthor: topic.author == comment.author,
+          );
         },
         separatorBuilder: (BuildContext context, int index) {
-          return Divider(height: 0.0);
+          return const Divider(height: 0.0);
         },
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),

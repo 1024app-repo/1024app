@@ -21,9 +21,6 @@ class TopicListView extends StatefulWidget {
 class TopicListViewState extends State<TopicListView> {
   bool loading = false;
   bool hasError = false;
-  bool showToTopBtn = false;
-
-  ScrollController _scrollController;
 
   EasyRefreshController _refreshController;
   List<Topic> items = new List();
@@ -42,27 +39,6 @@ class TopicListViewState extends State<TopicListView> {
   void dispose() {
     super.dispose();
     _refreshController.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
-    _scrollController = PrimaryScrollController.of(context);
-//    _scrollController.addListener(() {
-//      if (_scrollController.offset < 500 && showToTopBtn) {
-//        if (mounted) {
-//          setState(() {
-//            showToTopBtn = false;
-//          });
-//        }
-//      } else if (_scrollController.offset >= 500 && showToTopBtn == false) {
-//        if (mounted) {
-//          setState(() {
-//            showToTopBtn = true;
-//          });
-//        }
-//      }
-//    });
-    super.didChangeDependencies();
   }
 
   Future _fetchData(int page) async {
@@ -98,21 +74,25 @@ class TopicListViewState extends State<TopicListView> {
     if (items.length > 0) {
       return Scaffold(
         body: Scrollbar(
-          child: bodyList(),
+          child: TopicList(
+            controller: _refreshController,
+            onRefresh: () async {
+              items.clear();
+              await _fetchData(1);
+              _refreshController.finishRefresh(success: true);
+            },
+            onLoad: () async {
+              var page = current + 1;
+              if (page > total) {
+                _refreshController.finishLoad(success: true, noMore: true);
+                return;
+              }
+              await _fetchData(page);
+              _refreshController.finishLoad(success: true, noMore: false);
+            },
+            items: items,
+          ),
         ),
-        floatingActionButton: !showToTopBtn
-            ? null
-            : FloatingActionButton(
-                mini: true,
-                child: Icon(Icons.arrow_upward),
-                onPressed: () {
-                  _scrollController.animateTo(
-                    .0,
-                    duration: Duration(milliseconds: 200),
-                    curve: Curves.ease,
-                  );
-                },
-              ),
       );
     } else if (hasError) {
       return NetworkError(
@@ -128,8 +108,24 @@ class TopicListViewState extends State<TopicListView> {
       size: 20,
     );
   }
+}
 
-  Widget bodyList() {
+class TopicList extends StatelessWidget {
+  final EasyRefreshController controller;
+  final OnRefreshCallback onRefresh;
+  final OnLoadCallback onLoad;
+  final List<Topic> items;
+
+  const TopicList({
+    Key key,
+    this.controller,
+    this.onRefresh,
+    this.onLoad,
+    this.items,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return EasyRefresh(
       header: RefreshHeader(
         color: Color(0xFF999999),
@@ -143,29 +139,17 @@ class TopicListViewState extends State<TopicListView> {
       child: ListView.separated(
         padding: EdgeInsets.all(0.0),
         itemBuilder: (context, index) {
-          return TopicItemView(items[index]);
+          return TopicItem(topic: items[index]);
         },
         separatorBuilder: (BuildContext context, int index) {
-          return Divider(height: 0.0);
+          return const Divider(height: 0.0);
         },
         itemCount: items.length,
+        cacheExtent: 250,
       ),
-      onRefresh: () async {
-        items.clear();
-        await _fetchData(1);
-        _refreshController.finishRefresh(success: true);
-      },
-      onLoad: () async {
-        var page = current + 1;
-        if (page > total) {
-          _refreshController.finishLoad(success: true, noMore: true);
-          return;
-        }
-        await _fetchData(page);
-        _refreshController.finishLoad(success: true, noMore: false);
-      },
-      controller: _refreshController,
-      scrollController: _scrollController,
+      onRefresh: onRefresh,
+      onLoad: onLoad,
+      controller: controller,
     );
   }
 }

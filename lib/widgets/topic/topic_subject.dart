@@ -8,16 +8,11 @@ import '../circle_avatar.dart';
 import '../colorful_tag.dart';
 import 'topic_content.dart';
 
-class TopicSubject extends StatefulWidget {
+class TopicSubject extends StatelessWidget {
   final Topic topic;
 
-  TopicSubject(this.topic);
+  const TopicSubject({Key key, this.topic}) : super(key: key);
 
-  @override
-  State<StatefulWidget> createState() => TopicSubjectState();
-}
-
-class TopicSubjectState extends State<TopicSubject> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -28,7 +23,7 @@ class TopicSubjectState extends State<TopicSubject> {
         children: <Widget>[
           // topic title
           Text(
-            widget.topic.title,
+            topic.title,
             softWrap: true,
             style: Theme.of(context).textTheme.title,
           ),
@@ -38,11 +33,11 @@ class TopicSubjectState extends State<TopicSubject> {
               children: <Widget>[
                 // 头像
                 CircleAvatarWithPlaceholder(
-                  imageUrl: widget.topic.subject.avatar,
-                  userName: widget.topic.author,
+                  imageUrl: topic.subject.avatar,
+                  userName: topic.author,
                   size: 40,
                 ),
-                SizedBox(width: 10.0),
+                const SizedBox(width: 10.0),
                 Expanded(
                   child: Column(
                     children: <Widget>[
@@ -52,19 +47,18 @@ class TopicSubjectState extends State<TopicSubject> {
                           Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: new Text(
-                              widget.topic.author,
+                              topic.author,
                               textAlign: TextAlign.left,
                               maxLines: 1,
                               style: Theme.of(context).textTheme.subtitle,
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 5,
                           ),
                           ColorfulTag(
-                            title: widget.topic.subject.level,
-                            color:
-                                colourLevel[widget.topic.subject.level.trim()],
+                            title: topic.subject.level,
+                            color: colourLevel[topic.subject.level.trim()],
                             fontSize: 10,
                           ),
                         ],
@@ -74,7 +68,7 @@ class TopicSubjectState extends State<TopicSubject> {
                           Padding(
                             padding: const EdgeInsets.only(top: 3.0),
                             child: Text(
-                              widget.topic.subject.time,
+                              topic.subject.time,
                               style: TextStyle(
                                 color: Theme.of(context).disabledColor,
                                 fontSize: 13,
@@ -89,7 +83,7 @@ class TopicSubjectState extends State<TopicSubject> {
               ],
             ),
           ),
-          TopicContent(content: widget.topic.subject.content),
+          TopicContent(content: topic.subject.content),
         ],
       ),
     );

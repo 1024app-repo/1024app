@@ -11,9 +11,9 @@ class ColorfulTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 2.0, right: 2.0),
+      padding: const EdgeInsets.only(left: 2.0, right: 2.0),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(2),

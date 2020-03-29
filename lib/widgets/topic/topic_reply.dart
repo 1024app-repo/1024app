@@ -6,17 +6,16 @@ import '../circle_avatar.dart';
 import '../colorful_tag.dart';
 import 'topic_content.dart';
 
-class TopicReply extends StatefulWidget {
+class TopicReply extends StatelessWidget {
   final Reply reply;
   final bool isAuthor;
 
-  TopicReply(this.reply, this.isAuthor, {Key key}) : super(key: key);
+  const TopicReply({
+    Key key,
+    this.reply,
+    this.isAuthor,
+  }) : super(key: key);
 
-  @override
-  State<StatefulWidget> createState() => TopicReplyState();
-}
-
-class TopicReplyState extends State<TopicReply> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -29,16 +28,17 @@ class TopicReplyState extends State<TopicReply> {
             children: <Widget>[
               // 评论item头像
               CircleAvatarWithPlaceholder(
-                imageUrl: widget.reply.avatar,
-                userName: widget.reply.author,
+                imageUrl: reply.avatar,
+                userName: reply.author,
                 size: 32,
               ),
               Offstage(
-                offstage: !widget.isAuthor,
+                offstage: !isAuthor,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 6.0),
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
                     decoration: BoxDecoration(
                       color: Colors.redAccent[100],
                       borderRadius: BorderRadius.circular(2),
@@ -52,7 +52,7 @@ class TopicReplyState extends State<TopicReply> {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             width: 10.0,
           ),
           // 回复主体
@@ -69,7 +69,7 @@ class TopicReplyState extends State<TopicReply> {
                         Row(
                           children: <Widget>[
                             Text(
-                              widget.reply.author,
+                              reply.author,
                               textAlign: TextAlign.left,
                               maxLines: 1,
                               style: TextStyle(
@@ -77,12 +77,12 @@ class TopicReplyState extends State<TopicReply> {
                                 fontSize: 14,
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 5,
                             ),
                             ColorfulTag(
-                              title: widget.reply.level,
-                              color: colourLevel[widget.reply.level.trim()],
+                              title: reply.level,
+                              color: colourLevel[reply.level.trim()],
                               fontSize: 9,
                             ),
                           ],
@@ -91,7 +91,7 @@ class TopicReplyState extends State<TopicReply> {
                         Row(
                           children: <Widget>[
                             Text(
-                              widget.reply.time.trim(),
+                              reply.time.trim(),
                               style: TextStyle(
                                 color: Theme.of(context).disabledColor,
                                 fontSize: 12,
@@ -101,19 +101,19 @@ class TopicReplyState extends State<TopicReply> {
                         )
                       ],
                     ),
-                    Spacer(),
+                    const Spacer(),
                     // 楼层
                     Container(
                       alignment: Alignment.center,
-                      child: new Text(
-                        "#${widget.reply.floor}",
+                      child: Text(
+                        "#${reply.floor}",
                         style: Theme.of(context).textTheme.caption,
                       ),
                     )
                   ],
                 ),
                 // 回复内容
-                TopicContent(content: widget.reply.content),
+                TopicContent(content: reply.content),
               ],
             ),
           )

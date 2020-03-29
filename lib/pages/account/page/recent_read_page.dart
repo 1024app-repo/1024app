@@ -1,3 +1,4 @@
+import 'package:communityfor1024/widgets/topic/topic_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -7,7 +8,6 @@ import 'package:oktoast/oktoast.dart';
 import '../../../api/model.dart';
 import '../../../util/db_helper.dart';
 import '../../../widgets/app_bar.dart';
-import '../../../widgets/topic/topic_item.dart';
 
 class RecentReadPage extends StatefulWidget {
   @override
@@ -77,7 +77,7 @@ class RecentReadPageState extends State<RecentReadPage> {
                           key: Key('key${item.id}'),
                           controller: _controller,
                           actionPane: SlidableDrawerActionPane(),
-                          child: TopicItemView(item),
+                          child: TopicItem(topic: item),
                           secondaryActions: <Widget>[
                             IconSlideAction(
                               caption: '删除',
@@ -96,7 +96,7 @@ class RecentReadPageState extends State<RecentReadPage> {
                         );
                       },
                       separatorBuilder: (BuildContext context, int index) {
-                        return Divider(height: 0.0);
+                        return const Divider(height: 0.0);
                       },
                       itemCount: snapshot.data.length,
                     ),

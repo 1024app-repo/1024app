@@ -21,7 +21,7 @@ class Routes {
         handler: Handler(
             handlerFunc:
                 (BuildContext context, Map<String, List<String>> params) =>
-                    Index()));
+                    IndexPage()));
 
     _routers.clear();
 

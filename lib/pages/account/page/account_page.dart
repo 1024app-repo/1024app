@@ -26,6 +26,7 @@ class AccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
+    print('AccountPage');
     var myNavChildren = [
       MyListTitle(
         leading: Icon(Icons.access_time),

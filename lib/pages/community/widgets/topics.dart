@@ -2,8 +2,8 @@ import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart'
     as extended;
 import 'package:flutter/material.dart';
 
-import '../../api/model.dart';
-import 'topic_list.dart';
+import '../../../api/model.dart';
+import '../../../widgets/topic/topic_list.dart';
 
 class TopicsView extends StatefulWidget {
   final Node node;
@@ -52,17 +52,17 @@ class TopicsViewState extends State<TopicsView>
               floating: true,
               pinned: true,
 //              snap: true,
-              bottom: new PreferredSize(
-                child: new TabBar(
+              bottom: PreferredSize(
+                child: TabBar(
                   isScrollable: true,
                   controller: _tabController,
                   tabs: widget.node.categories.map((Category v) {
-                    return new Tab(
+                    return Tab(
                       text: v.name,
                     );
                   }).toList(),
                 ),
-                preferredSize: new Size(double.infinity, 46.0),
+                preferredSize: const Size(double.infinity, 46.0),
               ),
               forceElevated: true,
               elevation: 1.0,
@@ -74,7 +74,7 @@ class TopicsViewState extends State<TopicsView>
           children: widget.node.categories
               .asMap()
               .map((int k, Category v) {
-                return new MapEntry(
+                return MapEntry(
                   k,
                   extended.NestedScrollViewInnerScrollPositionKeyWidget(
                     Key("Key$k"),

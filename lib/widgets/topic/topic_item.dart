@@ -1,56 +1,48 @@
 import 'package:communityfor1024/pages/detail/page/topic_detail_page.dart';
+import 'package:communityfor1024/util/db_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:identicon/identicon.dart';
 
 import '../../api/model.dart';
-import '../../util/db_helper.dart';
 import '../colorful_tag.dart';
 
-class TopicItemView extends StatefulWidget {
+class TopicItem extends StatelessWidget {
   final Topic topic;
 
-  TopicItemView(this.topic);
-
-  @override
-  _TopicItemViewState createState() => _TopicItemViewState();
-}
-
-class _TopicItemViewState extends State<TopicItemView> {
-  final dbHelper = DbHelper.instance;
+  const TopicItem({Key key, this.topic}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    print('TopicItem:' + topic.id);
+
     return InkWell(
       onTap: () {
-        setState(() {
-          widget.topic.readStatus = true;
-        });
-
-        dbHelper.insert(widget.topic);
-
+        topic.readStatus = true;
+        DbHelper.instance.insert(topic);
         Navigator.push(
           context,
           new MaterialPageRoute(
-            builder: (context) => new TopicDetailPage(widget.topic.id),
+            builder: (context) => TopicDetailPage(topic.id),
           ),
         );
+        return;
       },
       child: Container(
         padding: const EdgeInsets.all(20),
-        color: widget.topic.readStatus ? Color(0xFFFFFFE0) : Colors.transparent,
+        color: topic.readStatus ? Color(0xFFFFFFE0) : Colors.transparent,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             // 标题
             Text(
-              widget.topic.title,
+              topic.title,
               style: TextStyle(
                 fontSize: 16,
                 color: Theme.of(context).textTheme.title.color,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             // 头像、作者、时间、回复数
@@ -58,15 +50,15 @@ class _TopicItemViewState extends State<TopicItemView> {
               children: <Widget>[
                 ClipOval(
                   child: Image.memory(
-                    Identicon().generate(widget.topic.author),
+                    Identicon().generate(topic.author),
                     width: 15,
                     height: 15,
                     gaplessPlayback: true,
                   ),
                 ),
-                SizedBox(width: 5),
+                const SizedBox(width: 5),
                 Text(
-                  widget.topic.author,
+                  topic.author,
                   textAlign: TextAlign.left,
                   maxLines: 1,
                   style: new TextStyle(
@@ -74,18 +66,18 @@ class _TopicItemViewState extends State<TopicItemView> {
                     color: Theme.of(context).textTheme.title.color,
                   ),
                 ),
-                SizedBox(width: 5),
+                const SizedBox(width: 5),
                 Text(
-                  "${widget.topic.replyTime}",
+                  "${topic.replyTime}",
                   style: TextStyle(
                     color: Theme.of(context).disabledColor,
                     fontSize: 13,
                   ),
                 ),
-                SizedBox(width: 5),
+                const SizedBox(width: 5),
                 // 熱門
                 Offstage(
-                  offstage: !widget.topic.hot,
+                  offstage: !topic.hot,
                   child: ColorfulTag(
                     title: '熱門',
                     color: Colors.redAccent[200],
@@ -94,7 +86,7 @@ class _TopicItemViewState extends State<TopicItemView> {
                 ),
                 // 精華
                 Offstage(
-                  offstage: !widget.topic.prime,
+                  offstage: !topic.prime,
                   child: ColorfulTag(
                     title: '精華',
                     color: Colors.purpleAccent[200],
@@ -103,25 +95,25 @@ class _TopicItemViewState extends State<TopicItemView> {
                 ),
                 // 置頂
                 Offstage(
-                  offstage: widget.topic.publishTime != 'Top-marks',
+                  offstage: topic.publishTime != 'Top-marks',
                   child: ColorfulTag(
                     title: '置頂',
-                    color: Colors.greenAccent[200],
+                    color: Colors.greenAccent[400],
                     fontSize: 8,
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
                 Padding(
-                  padding: const EdgeInsets.only(left: 4.0),
-                  child: new Text(
-                    widget.topic.replyCount,
+                  padding: const EdgeInsets.only(right: 2.0),
+                  child: Text(
+                    topic.replyCount,
                     style: TextStyle(
                       color: Theme.of(context).disabledColor,
                       fontSize: 13,
                     ),
                   ),
                 ),
-                Icon(
+                const Icon(
                   Icons.chat_bubble_outline,
                   size: 13.0,
                   color: Colors.grey,

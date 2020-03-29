@@ -7,94 +7,89 @@ import 'account/page/account_page.dart';
 import 'community/page/community_page.dart';
 import 'home/page/home_page.dart';
 
-class IndexProvider extends ValueNotifier<int> {
-  IndexProvider() : super(0);
-}
-
-class Index extends StatefulWidget {
+class IndexPage extends StatelessWidget {
   @override
-  State<StatefulWidget> createState() => IndexState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      child: BottomNav(),
+      create: (context) => BottomNavigationBarProvider(),
+    );
+  }
 }
 
-class IndexState extends State<Index> {
+class BottomNavigationBarProvider with ChangeNotifier {
+  int _currentIndex = 0;
+
+  get currentIndex => _currentIndex;
+
+  set currentIndex(val) {
+    _currentIndex = val;
+    notifyListeners();
+  }
+}
+
+// ignore: must_be_immutable
+class BottomNav extends StatelessWidget {
+  BottomNav({Key key}) : super(key: key);
+
   DateTime _lastPressedAt;
 
   PageController _pageController = new PageController(initialPage: 0);
-  IndexProvider provider = IndexProvider();
 
-  List<Widget> _pages;
-
-  @override
-  void initState() {
-    super.initState();
-    initData();
-  }
-
-  void initData() {
-    _pages = [
-      HomePage(),
-      CommunityPage(),
-      AccountPage(),
-    ];
-  }
+  final _pages = [
+    HomePage(),
+    CommunityPage(),
+    AccountPage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<IndexProvider>(
-      builder: (_) => provider,
-      child: WillPopScope(
-        onWillPop: () async {
-          if (_lastPressedAt == null ||
-              DateTime.now().difference(_lastPressedAt) >
-                  Duration(seconds: 1)) {
-            _lastPressedAt = DateTime.now();
-            showToast('再次点击退出应用');
-            return false;
-          }
-          return true;
-        },
-        child: Scaffold(
-          body: PageView(
-            controller: _pageController,
-            onPageChanged: (index) {
-              provider.value = index;
-            },
-            children: _pages,
-            physics: NeverScrollableScrollPhysics(), // 禁止滑动
-          ),
-          bottomNavigationBar: Consumer<IndexProvider>(
-            builder: (_, provider, __) {
-              return BottomNavigationBar(
-                type: BottomNavigationBarType.fixed,
-                items: [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.home),
-                    title: Text("首页"),
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.dashboard),
-                    title: Text("社区"),
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.person),
-                    title: Text("个人"),
-                  )
-                ],
-                currentIndex: provider.value,
-                selectedItemColor: Theme.of(context).accentColor,
-                onTap: (index) {
-                  if (index != provider.value) {
-                    _pageController.jumpToPage(index);
-                  } else if (index == 0) {
-                    eventBus.emit('RefreshTopicsEvent');
-//                  } else if (index == 2) {
-//                    eventBus.emit('RefreshPropertyEvent');
-                  }
-                },
-                elevation: 5,
-              );
-            },
-          ),
+    final provider = Provider.of<BottomNavigationBarProvider>(context);
+
+    return WillPopScope(
+      onWillPop: () async {
+        if (_lastPressedAt == null ||
+            DateTime.now().difference(_lastPressedAt) > Duration(seconds: 1)) {
+          _lastPressedAt = DateTime.now();
+          showToast('再次点击退出应用');
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        body: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            provider.currentIndex = index;
+          },
+          children: _pages,
+          physics: NeverScrollableScrollPhysics(), // 禁止滑动
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: provider.currentIndex,
+          onTap: (index) {
+            if (index != provider.currentIndex) {
+              _pageController.jumpToPage(index);
+            } else if (index == 0) {
+              eventBus.emit('RefreshTopicsEvent');
+            }
+          },
+          type: BottomNavigationBarType.fixed,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              title: Text("首页"),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard),
+              title: Text("社区"),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              title: Text("个人"),
+            )
+          ],
+          elevation: 5,
         ),
       ),
     );
