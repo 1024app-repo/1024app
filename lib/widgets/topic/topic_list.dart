@@ -23,6 +23,8 @@ class TopicListViewState extends State<TopicListView> {
   bool hasError = false;
 
   EasyRefreshController _refreshController;
+  ScrollController _scrollController;
+
   List<Topic> items = new List();
   int current = 1;
   int total = 1;
@@ -39,6 +41,12 @@ class TopicListViewState extends State<TopicListView> {
   void dispose() {
     super.dispose();
     _refreshController.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    _scrollController = PrimaryScrollController.of(context);
+    super.didChangeDependencies();
   }
 
   Future _fetchData(int page) async {
@@ -75,7 +83,8 @@ class TopicListViewState extends State<TopicListView> {
       return Scaffold(
         body: Scrollbar(
           child: TopicList(
-            controller: _refreshController,
+            refreshController: _refreshController,
+            scrollController: _scrollController,
             onRefresh: () async {
               items.clear();
               await _fetchData(1);
@@ -111,14 +120,16 @@ class TopicListViewState extends State<TopicListView> {
 }
 
 class TopicList extends StatelessWidget {
-  final EasyRefreshController controller;
+  final EasyRefreshController refreshController;
+  final ScrollController scrollController;
   final OnRefreshCallback onRefresh;
   final OnLoadCallback onLoad;
   final List<Topic> items;
 
   const TopicList({
     Key key,
-    this.controller,
+    this.refreshController,
+    this.scrollController,
     this.onRefresh,
     this.onLoad,
     this.items,
@@ -149,7 +160,8 @@ class TopicList extends StatelessWidget {
       ),
       onRefresh: onRefresh,
       onLoad: onLoad,
-      controller: controller,
+      controller: refreshController,
+      scrollController: scrollController,
     );
   }
 }
