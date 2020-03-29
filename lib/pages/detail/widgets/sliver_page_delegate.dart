@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 class SliverPageDelegate extends SliverPersistentHeaderDelegate {
@@ -14,7 +16,22 @@ class SliverPageDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return new SizedBox.expand(child: child);
+    return SizedBox.expand(
+      child: Container(
+        color: Colors.transparent,
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200.withOpacity(0.5),
+              ),
+              child: child,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override

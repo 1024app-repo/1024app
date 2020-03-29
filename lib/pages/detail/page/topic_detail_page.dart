@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:communityfor1024/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../../../api/api.dart';
 import '../../../api/model.dart';
-import '../../../widgets/app_bar.dart';
 import '../../../widgets/error/error.dart';
 import '../../../widgets/refresh_indicator.dart';
 import '../../../widgets/topic/topic_reply.dart';
@@ -80,10 +80,8 @@ class TopicDetailPageState extends State<TopicDetailPage> {
           items.addAll(
             reverse ? res.replies.reversed.toList() : res.replies,
           );
-//          topic.readStatus = true;
           topic.total = res.total;
           topic.current = res.current;
-//          DbHelper.instance.insert(topic);
           loading = false;
         });
       }
@@ -183,49 +181,41 @@ class TopicDetailPageState extends State<TopicDetailPage> {
             delegate: SliverPageDelegate(
               maxHeight: 40,
               minHeight: 40,
-              child: Container(
-                padding: const EdgeInsets.only(left: 20),
-                color: Colors.grey[200],
-                alignment: Alignment.centerLeft,
-                child: Row(children: <Widget>[
-                  Text('页码 ${topic.current} / ${topic.total}'),
-                  const Spacer(),
-                  RaisedButton(
-                    color: Colors.grey[200],
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    elevation: 0.0,
-                    focusElevation: 0.0,
-                    hoverElevation: 0.0,
-                    highlightElevation: 0.0,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          reverse ? "倒序" : "正序",
-                          style: TextStyle(
-                            fontWeight: FontWeight.normal,
-                            color: Theme.of(context).textTheme.body1.color,
-                          ),
-                        ),
-                        Icon(
-                          Icons.swap_vert,
-                          size: 20,
+              child: Row(children: <Widget>[
+                Container(
+                  margin: const EdgeInsets.only(left: 25),
+                  child: Text('页码 ${topic.current} / ${topic.total}'),
+                ),
+                const Spacer(),
+                FlatButton(
+                  color: Colors.transparent,
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  child: Row(
+                    children: <Widget>[
+                      Text(
+                        reverse ? "倒序" : "正序",
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
                           color: Theme.of(context).textTheme.body1.color,
                         ),
-                      ],
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        reverse = !reverse;
-                        items.clear();
-                      });
-                      _fetchData(reverse ? topic.total : 1);
-                    },
-                  )
-                ]),
-              ),
+                      ),
+                      Icon(
+                        Icons.swap_vert,
+                        size: 20,
+                        color: Theme.of(context).textTheme.body1.color,
+                      ),
+                    ],
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      reverse = !reverse;
+                      items.clear();
+                    });
+                    _fetchData(reverse ? topic.total : 1);
+                  },
+                )
+              ]),
             ),
           );
   }
