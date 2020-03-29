@@ -1,12 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' show parse;
-import 'package:oktoast/oktoast.dart';
 
 import '../util/db_helper.dart';
 import '../util/fetcher.dart';
 import '../util/time_formatter.dart';
-import '../util/utils.dart';
 import 'model.dart';
 
 RegExp regId = RegExp(r"[1-9]\d*");
@@ -25,11 +22,11 @@ class API {
     document.querySelectorAll(".tr3.f_one").forEach((v) {
       var e = v.querySelector('h2 > a');
       nodes.add(Node(
-        '',
-        e.text,
-        e.attributes['href'],
-        v.querySelector('.smalltxt.gray').text,
-        [],
+        id: '',
+        name: e.text,
+        url: e.attributes['href'],
+        desc: v.querySelector('.smalltxt.gray').text,
+        categories: [],
       ));
     });
 
@@ -52,17 +49,18 @@ class API {
 
       if (r != null) {
         Topic topic = Topic(
-          node.id,
-          regId.allMatches(h).last.group(0),
-          t.text
+          id: regId.allMatches(h).last.group(0),
+          title: t.text
               .replaceAll(RegExp(r'\s+'), "")
               .replaceAll(RegExp(r'\［'), '[')
               .replaceAll(RegExp(r'］'), ']'),
-          v.querySelector('.bl').text.trim(),
-          v.querySelector('.f12').text.trim(),
-          r.parent.text.substring(r.parent.text.indexOf("by:") + 3).trim(),
-          formatTime(DateTime.parse(r.text.trim()).millisecondsSinceEpoch),
-          r.parent.previousElementSibling.text.trim(),
+          author: v.querySelector('.bl').text.trim(),
+          publishTime: v.querySelector('.f12').text.trim(),
+          replier:
+              r.parent.text.substring(r.parent.text.indexOf("by:") + 3).trim(),
+          replyTime:
+              formatTime(DateTime.parse(r.text.trim()).millisecondsSinceEpoch),
+          replyCount: r.parent.previousElementSibling.text.trim(),
         );
 
         v.querySelectorAll(".sred").forEach((e) {
@@ -84,14 +82,15 @@ class API {
       node.current = int.parse(v[0]);
       node.total = int.parse(v[1]);
     }
-    await DbHelper.instance.updateStatus(node.topics);
+    await DbHelper.instance.addReadState(node.topics);
 
     return node;
   }
 
-  static Future<Topic> getTopicDetail(Topic topic, int page) async {
+  static Future<Topic> getTopicDetail(String topicId, int page) async {
     var url = "read.php?";
 
+    Topic topic = new Topic(id: topicId);
     if (page > 1) {
       url += "tid=${topic.id}&page=$page";
     } else {
@@ -102,6 +101,13 @@ class API {
     topic.replies = List<Reply>();
     var document = await Fetcher.invoke(url);
 
+    // 解析帖子标题
+    if (page < 2) {
+      topic.title =
+          document.querySelector('a[href="read.php?tid=${topic.id}"]').text;
+    }
+
+    // 帖子下的回复内容
     document.querySelectorAll(".t.t2").forEach((v) {
       var a = v.querySelector('.r_two');
       var t = v.querySelector(".tipad");
@@ -124,19 +130,22 @@ class API {
       var time = (t.text.substring(i + 8, i + 24) + ':00').trim();
 
       Reply reply = Reply(
-        a.querySelector("b").text.trim(),
-        avatar,
-        a.querySelector("font").text,
-        v
+        author: a.querySelector("b").text.trim(),
+        avatar: avatar,
+        level: a.querySelector("font").text,
+        content: v
             .querySelector(".tpc_content")
             .innerHtml
             .replaceAll('<h6 class="quote">Quote:</h6>', '<div></div>'),
-        formatTime(DateTime.parse(time).millisecondsSinceEpoch),
-        floor,
+        time: formatTime(DateTime.parse(time).millisecondsSinceEpoch),
+        floor: floor,
       );
 
       if (floor == "0") {
         topic.subject = reply;
+        topic.author = reply.author;
+        topic.publishTime = reply.time;
+
         List<dom.Element> images = parse(topic.subject.content)
             .querySelectorAll("input[type='image'],img");
         if (images != null && images.isNotEmpty) {
@@ -159,36 +168,5 @@ class API {
     }
 
     return topic;
-  }
-
-  static Future replyTopic(String nodeId, String topicId, String title,
-      String content, BuildContext context) async {
-    var data = buildQueryString({
-      'atc_usesign': 1,
-      'atc_convert': 1,
-      'atc_autourl': 1,
-      'atc_title': 'Re:$title',
-      'atc_content': content,
-      'step': 2,
-      'action': 'reply',
-      'fid': nodeId,
-      'tid': topicId,
-      'atc_attachment': 'none',
-      'pid': '',
-      'article': '',
-      'verify': 'verify',
-    });
-
-    var resp = await Fetcher.invoke(
-      "post.php",
-      method: 'POST',
-      data: data,
-    );
-
-    if (resp.outerHtml.contains('發貼完畢')) {
-      showToast('回复成功');
-    } else {
-      showToast(resp.querySelector('.f_one').text.trim());
-    }
   }
 }

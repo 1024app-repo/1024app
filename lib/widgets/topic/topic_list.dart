@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -74,7 +73,7 @@ class TopicListViewState extends State<TopicListView> {
       Node node;
       try {
         node = await API.getNodeDetail(widget.node, page);
-      } on DioError catch (e) {
+      } catch (e) {
         print(e);
         setState(() {
           loading = false;
@@ -82,7 +81,6 @@ class TopicListViewState extends State<TopicListView> {
         });
         return;
       }
-      print(node.topics);
 
       if (mounted) {
         setState(() {
@@ -93,17 +91,6 @@ class TopicListViewState extends State<TopicListView> {
         });
       }
     }
-  }
-
-  Future _onRefresh() async {
-    Node node = await API.getNodeDetail(widget.node, 1);
-    if (mounted) {
-      setState(() {
-        items.clear();
-        items.addAll(node.topics);
-      });
-    }
-    _refreshController.finishRefresh(success: true);
   }
 
   @override

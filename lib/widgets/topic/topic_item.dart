@@ -1,8 +1,8 @@
+import 'package:communityfor1024/pages/detail/page/topic_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:identicon/identicon.dart';
 
 import '../../api/model.dart';
-import '../../pages/detail/page/topic_detail_page.dart';
 import '../../util/db_helper.dart';
 import '../colorful_tag.dart';
 
@@ -23,24 +23,21 @@ class _TopicItemViewState extends State<TopicItemView> {
     return InkWell(
       onTap: () {
         setState(() {
-          widget.topic.readTime = new DateTime.now().toString();
+          widget.topic.readStatus = true;
         });
 
-        dbHelper.insertOrUpdate(widget.topic);
+        dbHelper.insert(widget.topic);
 
         Navigator.push(
           context,
           new MaterialPageRoute(
-            builder: (context) => new TopicDetailPage(widget.topic),
-            maintainState: false,
+            builder: (context) => new TopicDetailPage(widget.topic.id),
           ),
         );
       },
       child: Container(
         padding: const EdgeInsets.all(20),
-        color: widget.topic.readTime != null
-            ? Color(0xFFFFFFE0)
-            : Colors.transparent,
+        color: widget.topic.readStatus ? Color(0xFFFFFFE0) : Colors.transparent,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -128,7 +125,7 @@ class _TopicItemViewState extends State<TopicItemView> {
                   Icons.chat_bubble_outline,
                   size: 13.0,
                   color: Colors.grey,
-                ),
+                )
               ],
             ),
           ],

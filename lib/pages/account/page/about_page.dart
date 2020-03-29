@@ -12,8 +12,9 @@ class AboutPageState extends State<AboutPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(title: '关于'),
-      body: Center(
-        child: Text('about'),
+      body: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Text('草榴非官方客户端'),
       ),
     );
   }

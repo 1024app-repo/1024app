@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../../api/model.dart';
 import '../../util/constants.dart';
-import '../../widgets/html_factory.dart';
 import '../circle_avatar.dart';
 import '../colorful_tag.dart';
+import 'topic_content.dart';
 
 class TopicReply extends StatefulWidget {
   final Reply reply;
@@ -114,11 +113,7 @@ class TopicReplyState extends State<TopicReply> {
                   ],
                 ),
                 // 回复内容
-                HtmlWidget(
-                  widget.reply.content,
-                  bodyPadding: const EdgeInsets.symmetric(vertical: 15),
-                  factoryBuilder: (config) => HtmlWidgetFactory(config),
-                ),
+                TopicContent(content: widget.reply.content),
               ],
             ),
           )

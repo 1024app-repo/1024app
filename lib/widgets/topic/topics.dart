@@ -78,7 +78,15 @@ class TopicsViewState extends State<TopicsView>
                   k,
                   extended.NestedScrollViewInnerScrollPositionKeyWidget(
                     Key("Key$k"),
-                    TopicListView(Node(v.id, v.name, v.url, '', null)),
+                    TopicListView(
+                      Node(
+                        id: v.id,
+                        name: v.name,
+                        url: v.url,
+                        desc: '',
+                        categories: [],
+                      ),
+                    ),
                   ),
                 );
               })

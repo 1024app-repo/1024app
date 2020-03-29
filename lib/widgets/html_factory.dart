@@ -1,3 +1,4 @@
+import 'package:communityfor1024/util/image_optimizer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
@@ -78,11 +79,8 @@ class HtmlWidgetFactory extends WidgetFactory {
       ),
     );
   }
-}
 
-String getOptimizedImage(String imageURL) {
-  if (imageURL.endsWith(".gif")) {
-    return imageURL;
+  BuildOp buildTagA() {
+    return BuildOp();
   }
-  return "https://images.weserv.nl/?url=$imageURL&default=$imageURL&w=600&q=75&output=webp";
 }

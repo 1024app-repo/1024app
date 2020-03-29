@@ -50,6 +50,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return OKToast(
       child: MaterialApp(
+        theme: ThemeData(
+          fontFamily: 'System',
+        ),
         home: home,
         onGenerateRoute: Application.router.generator,
         localizationsDelegates: const [

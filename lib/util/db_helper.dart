@@ -42,24 +42,21 @@ class DbHelper {
   Future _onCreate(Database db, int version) async {
     await db.execute('''
     CREATE TABLE $table (
-      nodeId TEXT NOT NULL,
       topicId TEXT PRIMARY KEY,
       title TEXT NOT NULL,
       author TEXT NOT NULL,
       publishTime TEXT NOT NULL,
       replier TEXT,
       replyTime TEXT,
-      replyCount TEXT NOT NULL,
-      readTime TEXT,
-      starredTime TEXT
+      replyCount TEXT
     )
     ''');
   }
 
-  Future<int> insertOrUpdate(Topic topic) async {
+  Future<int> insert(Topic topic) async {
     Database db = await instance.database;
     if (await queryTopic(topic.id) != null) {
-      return await update(topic);
+      delete(topic.id);
     }
     return await db.insert(table, topic.toMap());
   }
@@ -76,15 +73,10 @@ class DbHelper {
     return null;
   }
 
-  Future<List<Topic>> updateStatus(List<Topic> list) async {
+  Future<List<Topic>> addReadState(List<Topic> list) async {
     for (var topic in list) {
-      var val = await queryTopic(topic.id);
-      if (val != null && val.readTime != null) {
-//        print("${topic.title} : 存在，设为已读");
-        topic.readTime = val.readTime;
-        topic.starredTime = val.starredTime;
-      } else {
-//        print("${topic.title} : 不存在");
+      if (await queryTopic(topic.id) != null) {
+        topic.readStatus = true;
       }
     }
     return list;
@@ -103,27 +95,9 @@ class DbHelper {
     return topicList;
   }
 
-  Future<List<Topic>> getStarredTopics() async {
-    var mapList = await queryAllRows();
-    List<Topic> topicList = List<Topic>();
-    mapList.forEach((map) {
-      Topic topic = Topic.fromMap(map);
-      if (topic.starredTime != null) {
-        topicList.insert(0, topic);
-      }
-    });
-    print("当前数据库共有${topicList.length}条记录");
-    return topicList;
-  }
-
-  Future<int> delAllRecentReadTopic() async {
+  Future<int> deleteAll() async {
     Database db = await instance.database;
-    return await db.delete(table, where: 'readTime IS NOT null');
-  }
-
-  Future<int> delStarredTopic(Topic topic) async {
-    topic.starredTime = null;
-    return await update(topic);
+    return await db.delete(table);
   }
 
   Future<int> update(Topic topic) async {
@@ -134,7 +108,6 @@ class DbHelper {
 
   Future<int> delete(String topicId) async {
     Database db = await instance.database;
-    print("删除某条已读： " + topicId);
     return await db.delete(table, where: 'topicId = ?', whereArgs: [topicId]);
   }
 }

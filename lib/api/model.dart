@@ -10,7 +10,7 @@ class Node {
   int total = 1;
   int current = 1;
 
-  Node(this.id, this.name, this.url, this.desc, this.categories);
+  Node({this.id, this.name, this.url, this.desc, this.categories});
 
   @override
   String toString() {
@@ -23,7 +23,7 @@ class Category {
   final String name;
   final String url;
 
-  Category(this.id, this.name, this.url);
+  Category({this.id, this.name, this.url});
 
   @override
   String toString() {
@@ -32,7 +32,6 @@ class Category {
 }
 
 class Topic {
-  String nodeId;
   String id;
   String title;
   String author;
@@ -44,8 +43,7 @@ class Topic {
   String replyTime;
   String replyCount;
 
-  String readTime;
-  String starredTime;
+  bool readStatus = false;
 
   Reply subject;
   List<String> images;
@@ -54,36 +52,35 @@ class Topic {
   int total = 1;
   int current = 1;
 
-  Topic(this.nodeId, this.id, this.title, this.author, this.publishTime,
-      this.replier, this.replyTime, this.replyCount);
+  Topic({
+    this.id,
+    this.title,
+    this.author,
+    this.publishTime,
+    this.replier,
+    this.replyTime,
+    this.replyCount,
+  });
 
   Topic.fromMap(Map<String, dynamic> map) {
-    this.nodeId = map['nodeId'];
     this.id = map['topicId'];
     this.title = map['title'];
-//    this.url = map['url'];
     this.author = map['author'];
     this.publishTime = map['publishTime'];
     this.replier = map['replier'];
     this.replyTime = map['replyTime'];
     this.replyCount = map['replyCount'];
-    this.readTime = map['readTime'];
-    this.starredTime = map['starredTime'];
   }
 
   Map<String, dynamic> toMap() {
     final map = Map<String, dynamic>();
-    map['nodeId'] = this.nodeId;
     map['topicId'] = this.id;
     map['title'] = this.title;
-//    map['url'] = this.url;
     map['author'] = this.author;
     map['publishTime'] = this.publishTime;
     map['replier'] = this.replier;
     map['replyTime'] = this.replyTime;
     map['replyCount'] = this.replyCount;
-    map['readTime'] = this.readTime;
-    map['starredTime'] = this.starredTime;
     return map;
   }
 
@@ -103,8 +100,14 @@ class Reply {
   final String time;
   final String floor;
 
-  Reply(this.author, this.avatar, this.level, this.content, this.time,
-      this.floor);
+  Reply({
+    this.author,
+    this.avatar,
+    this.level,
+    this.content,
+    this.time,
+    this.floor,
+  });
 
   @override
   String toString() {

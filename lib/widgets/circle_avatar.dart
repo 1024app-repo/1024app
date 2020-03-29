@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:communityfor1024/util/image_optimizer.dart';
 import 'package:flutter/material.dart';
 import 'package:identicon/identicon.dart';
 
@@ -23,9 +24,9 @@ class CircleAvatarWithPlaceholder extends StatelessWidget {
     return ClipOval(
       child: imageUrl != null
           ? CachedNetworkImage(
-              imageUrl: imageUrl,
+              imageUrl: getOptimizedImage(imageUrl),
               imageBuilder: (context, imageProvider) => Image.network(
-                imageUrl,
+                getOptimizedImage(imageUrl),
                 width: size,
                 height: size,
                 gaplessPlayback: true,

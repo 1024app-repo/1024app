@@ -35,13 +35,6 @@ class AccountPageState extends State<AccountPage> {
         },
       ),
       MyListTitle(
-        leading: Icon(Icons.favorite_border),
-        title: Text("我的收藏"),
-        onTap: () {
-          Routes.push(context, AccountRouter.favoriteTopicPage);
-        },
-      ),
-      MyListTitle(
         leading: Icon(Icons.cached),
         title: Text("清除缓存"),
         content: cacheSize ?? '计算中...',

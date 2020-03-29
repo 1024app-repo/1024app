@@ -1,13 +1,12 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../../api/model.dart';
 import '../../util/constants.dart';
 import '../circle_avatar.dart';
 import '../colorful_tag.dart';
-import '../html_factory.dart';
+import 'topic_content.dart';
 
 class TopicSubject extends StatefulWidget {
   final Topic topic;
@@ -22,22 +21,20 @@ class TopicSubjectState extends State<TopicSubject> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(15),
+      color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           // topic title
-          Container(
-            padding: const EdgeInsets.all(10),
-            child: new Text(
-              widget.topic.title,
-              softWrap: true,
-              style: Theme.of(context).textTheme.title,
-            ),
+          Text(
+            widget.topic.title,
+            softWrap: true,
+            style: Theme.of(context).textTheme.title,
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: new Row(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Row(
               children: <Widget>[
                 // 头像
                 CircleAvatarWithPlaceholder(
@@ -92,11 +89,7 @@ class TopicSubjectState extends State<TopicSubject> {
               ],
             ),
           ),
-          // topic content
-          HtmlWidget(
-            widget.topic.subject.content.replaceAll('ess-data', 'data-src'),
-            factoryBuilder: (config) => HtmlWidgetFactory(config),
-          ),
+          TopicContent(content: widget.topic.subject.content),
         ],
       ),
     );

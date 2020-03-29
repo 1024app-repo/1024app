@@ -33,13 +33,15 @@ class HomePageState extends State<HomePage>
     super.build(context);
     return Scaffold(
       appBar: MyAppBar(title: "草榴社区"),
-      body: TopicListView(Node(
-        '7',
-        "技術討論區",
-        "thread0806.php?fid=7",
-        "所有",
-        null,
-      )),
+      body: TopicListView(
+        Node(
+          id: '7',
+          name: "技術討論區",
+          url: "thread0806.php?fid=7",
+          desc: "所有",
+          categories: [],
+        ),
+      ),
     );
   }
 
