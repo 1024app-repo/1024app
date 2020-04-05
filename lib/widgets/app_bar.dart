@@ -9,6 +9,6 @@ class MyAppBar extends AppBar {
             style: TextStyle(fontSize: 18),
           ),
           actions: actions,
-          elevation: 1.0,
+          elevation: 2.0,
         );
 }

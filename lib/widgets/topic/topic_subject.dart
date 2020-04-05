@@ -1,29 +1,29 @@
 import 'dart:ui';
 
+import 'package:communityfor1024/api/model.dart';
 import 'package:flutter/material.dart';
 
-import '../../api/model.dart';
 import '../../util/constants.dart';
-import '../circle_avatar.dart';
+import '../avatar_letter.dart';
 import '../colorful_tag.dart';
 import 'topic_content.dart';
 
 class TopicSubject extends StatelessWidget {
-  final Topic topic;
+  final Reply subject;
 
-  const TopicSubject({Key key, this.topic}) : super(key: key);
+  const TopicSubject(this.subject);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(10),
       color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           // topic title
           Text(
-            topic.title,
+            subject.title,
             softWrap: true,
             style: Theme.of(context).textTheme.title,
           ),
@@ -32,10 +32,13 @@ class TopicSubject extends StatelessWidget {
             child: Row(
               children: <Widget>[
                 // 头像
-                CircleAvatarWithPlaceholder(
-                  imageUrl: topic.subject.avatar,
-                  userName: topic.author,
+                AvatarLetter(
                   size: 40,
+                  fontSize: 16,
+                  upperCase: true,
+                  numberLetters: 1,
+                  letterType: LetterType.Circular,
+                  text: subject.author,
                 ),
                 const SizedBox(width: 10.0),
                 Expanded(
@@ -47,7 +50,7 @@ class TopicSubject extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: new Text(
-                              topic.author,
+                              subject.author,
                               textAlign: TextAlign.left,
                               maxLines: 1,
                               style: Theme.of(context).textTheme.subtitle,
@@ -57,8 +60,8 @@ class TopicSubject extends StatelessWidget {
                             width: 5,
                           ),
                           ColorfulTag(
-                            title: topic.subject.level,
-                            color: colourLevel[topic.subject.level.trim()],
+                            title: subject.level,
+                            color: colourLevel[subject.level],
                             fontSize: 10,
                           ),
                         ],
@@ -68,7 +71,7 @@ class TopicSubject extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(top: 3.0),
                             child: Text(
-                              topic.subject.time,
+                              subject.time,
                               style: TextStyle(
                                 color: Theme.of(context).disabledColor,
                                 fontSize: 13,
@@ -83,7 +86,10 @@ class TopicSubject extends StatelessWidget {
               ],
             ),
           ),
-          TopicContent(content: topic.subject.content),
+          TopicContent(
+            content: subject.content,
+            viewImage: true,
+          ),
         ],
       ),
     );

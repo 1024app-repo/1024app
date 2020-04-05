@@ -33,7 +33,7 @@ class NetworkError extends StatelessWidget {
             Container(
               margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: RaisedButton(
-                color: Colors.blue,
+                color: Colors.indigo,
                 child: const Text(
                   "重新加载",
                   style: TextStyle(

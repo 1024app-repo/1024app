@@ -1,40 +1,40 @@
+import 'package:communityfor1024/blocs/list/bloc.dart';
+import 'package:communityfor1024/util/event_bus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-import '../../api/api.dart';
 import '../../api/model.dart';
-import '../../util/event_bus.dart';
 import '../../widgets/error/error.dart';
 import '../refresh_indicator.dart';
 import 'topic_item.dart';
 
 class TopicListView extends StatefulWidget {
-  final Node node;
+  final String nodeId;
 
-  TopicListView(this.node);
+  TopicListView({this.nodeId});
 
   @override
   State<StatefulWidget> createState() => new TopicListViewState();
 }
 
 class TopicListViewState extends State<TopicListView> {
-  bool loading = false;
-  bool hasError = false;
-
   EasyRefreshController _refreshController;
   ScrollController _scrollController;
 
-  List<Topic> items = new List();
-  int current = 1;
-  int total = 1;
+  TopicListBloc _bloc;
 
   @override
   void initState() {
     super.initState();
     _refreshController = EasyRefreshController();
     eventBus.on('RefreshTopicsEvent', (_) => _refreshController.callRefresh());
-    _fetchData(1);
+    _bloc = BlocProvider.of<TopicListBloc>(context)
+      ..add(RefreshEvent(
+        nodeId: widget.nodeId,
+        controller: _refreshController,
+      ));
   }
 
   @override
@@ -44,77 +44,47 @@ class TopicListViewState extends State<TopicListView> {
   }
 
   @override
-  void didChangeDependencies() {
-    _scrollController = PrimaryScrollController.of(context);
-    super.didChangeDependencies();
-  }
-
-  Future _fetchData(int page) async {
-    if (!loading) {
-      loading = true;
-      hasError = false;
-
-      Node node;
-      try {
-        node = await API.getNodeDetail(widget.node, page);
-      } catch (e) {
-        print(e);
-        setState(() {
-          loading = false;
-          hasError = true;
-        });
-        return;
-      }
-
-      if (mounted) {
-        setState(() {
-          items.addAll(node.topics);
-          current = node.current;
-          total = node.total;
-          loading = false;
-        });
-      }
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (items.length > 0) {
-      return Scaffold(
-        body: Scrollbar(
-          child: TopicList(
-            refreshController: _refreshController,
-            scrollController: _scrollController,
-            onRefresh: () async {
-              items.clear();
-              await _fetchData(1);
-              _refreshController.finishRefresh(success: true);
+    return BlocBuilder<TopicListBloc, TopicListState>(
+      // ignore: missing_return
+      builder: (context, state) {
+        if (state is TopicListUninitialized) {
+          return SpinKitWave(
+            color: Colors.indigo,
+            type: SpinKitWaveType.start,
+            size: 20,
+          );
+        } else if (state is TopicListError) {
+          return NetworkError(
+            onPress: () async {
+              _bloc.add(RefreshEvent(
+                nodeId: widget.nodeId,
+                controller: _refreshController,
+              ));
             },
-            onLoad: () async {
-              var page = current + 1;
-              if (page > total) {
-                _refreshController.finishLoad(success: true, noMore: true);
-                return;
-              }
-              await _fetchData(page);
-              _refreshController.finishLoad(success: true, noMore: false);
-            },
-            items: items,
-          ),
-        ),
-      );
-    } else if (hasError) {
-      return NetworkError(
-        onPress: () async {
-          await _fetchData(1);
-        },
-      );
-    }
-
-    return SpinKitWave(
-      color: Color(0xFF999999),
-      type: SpinKitWaveType.start,
-      size: 20,
+          );
+        } else if (state is TopicListLoaded) {
+          return Scrollbar(
+            child: TopicList(
+              refreshController: _refreshController,
+              scrollController: _scrollController,
+              onRefresh: () async {
+                _bloc.add(RefreshEvent(
+                  nodeId: widget.nodeId,
+                  controller: _refreshController,
+                ));
+              },
+              onLoad: () async {
+                _bloc.add(LoadMoreEvent(
+                  nodeId: widget.nodeId,
+                  controller: _refreshController,
+                ));
+              },
+              items: state.topics,
+            ),
+          );
+        }
+      },
     );
   }
 }
@@ -139,10 +109,10 @@ class TopicList extends StatelessWidget {
   Widget build(BuildContext context) {
     return EasyRefresh(
       header: RefreshHeader(
-        color: Color(0xFF999999),
+        color: Colors.indigo,
       ),
       footer: RefreshFooter(
-        color: Color(0xFF999999),
+        color: Colors.indigo,
         enableHapticFeedback: false,
       ),
       enableControlFinishRefresh: true,
@@ -153,7 +123,7 @@ class TopicList extends StatelessWidget {
           return TopicItem(topic: items[index]);
         },
         separatorBuilder: (BuildContext context, int index) {
-          return const Divider(height: 0.0);
+          return const Divider(height: 0);
         },
         itemCount: items.length,
         cacheExtent: 250,

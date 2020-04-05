@@ -1,18 +1,16 @@
-import 'dart:async';
-import 'dart:ui';
-
+import 'package:communityfor1024/blocs/detail/bloc.dart';
+import 'package:communityfor1024/pages/detail/widgets/sliver_page_delegate.dart';
 import 'package:communityfor1024/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-import '../../../api/api.dart';
 import '../../../api/model.dart';
 import '../../../widgets/error/error.dart';
 import '../../../widgets/refresh_indicator.dart';
 import '../../../widgets/topic/topic_reply.dart';
 import '../../../widgets/topic/topic_subject.dart';
-import '../widgets/sliver_page_delegate.dart';
 
 class TopicDetailPage extends StatefulWidget {
   final String topicId;
@@ -26,24 +24,20 @@ class TopicDetailPage extends StatefulWidget {
 class TopicDetailPageState extends State<TopicDetailPage> {
   final GlobalKey globalKey = GlobalKey();
 
-  Topic topic;
-
-  bool loading = false;
-  bool hasError = false;
-  bool reverse = false;
-
   ScrollController _scrollController = new ScrollController();
-
   EasyRefreshController _refreshController;
-
-  List<Reply> items = List();
+  TopicDetailBloc _bloc;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
     _refreshController = EasyRefreshController();
-    _fetchData(1);
+    _bloc = BlocProvider.of<TopicDetailBloc>(context)
+      ..add(RefreshEvent(
+        topicId: widget.topicId,
+        controller: _refreshController,
+      ));
   }
 
   @override
@@ -53,197 +47,107 @@ class TopicDetailPageState extends State<TopicDetailPage> {
     super.dispose();
   }
 
-  Future _fetchData(int page) async {
-    print(page);
-    if (!loading) {
-      loading = true;
-      hasError = false;
-
-      Topic res;
-      try {
-        res = await API.getTopicDetail(widget.topicId, page);
-      } catch (e) {
-        print(e);
-        setState(() {
-          loading = false;
-          hasError = true;
-        });
-        return;
-      }
-
-      if (mounted) {
-        setState(() {
-          // 第一页时更新所有数据，此后只更新回复和页码
-          if (page < 2) {
-            topic = res;
-          }
-          items.addAll(
-            reverse ? res.replies.reversed.toList() : res.replies,
-          );
-          topic.total = res.total;
-          topic.current = res.current;
-          loading = false;
-        });
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(title: '详情'),
-      body: hasError
-          ? NetworkError(onPress: () async {
-              _fetchData(1);
-            })
-          : !loading
-              ? Container(
-                  color: Colors.grey[200],
-                  child: Scrollbar(
-                    child: EasyRefresh(
-                      enableControlFinishRefresh: true,
-                      enableControlFinishLoad: true,
-                      header: RefreshHeader(
-                        color: Color(0xFF999999),
-                      ),
-                      footer: RefreshFooter(
-                        color: Color(0xFF999999),
-                        enableHapticFeedback: false,
-                      ),
-                      child: CustomScrollView(
-                        slivers: <Widget>[
-                          // 详情view
-                          SliverToBoxAdapter(
-                            child: detailCard(),
-                          ),
-
-                          pagePersistent(),
-
-                          // 评论view
-                          SliverToBoxAdapter(
-                            child: commentCard(),
-                          ),
-                        ],
-                        controller: _scrollController,
-                      ),
-                      onRefresh: () async {
-                        items.clear();
-                        await _fetchData(1);
-                        _refreshController.finishRefresh(success: true);
-                      },
-                      onLoad: () async {
-                        var page =
-                            reverse ? topic.current - 1 : topic.current + 1;
-                        if (page > topic.total || page <= 1) {
-                          _refreshController.finishLoad(
-                              success: true, noMore: true);
-                          return;
-                        }
-                        await _fetchData(page);
-                        _refreshController.finishLoad(
-                            success: true, noMore: false);
-                      },
-                      controller: _refreshController,
-                      scrollController: _scrollController,
+      body: BlocBuilder<TopicDetailBloc, TopicDetailState>(
+        // ignore: missing_return
+        builder: (context, state) {
+          if (state is TopicDetailUninitialized) {
+            return SpinKitWave(
+              color: Colors.indigo,
+              type: SpinKitWaveType.start,
+              size: 20,
+            );
+          } else if (state is TopicDetailError) {
+            return NetworkError(
+              onPress: () async {
+                _bloc.add(RefreshEvent(
+                  topicId: widget.topicId,
+                  controller: _refreshController,
+                ));
+              },
+            );
+          } else if (state is TopicDetailLoaded) {
+            return Scrollbar(
+              child: EasyRefresh(
+                enableControlFinishRefresh: true,
+                enableControlFinishLoad: true,
+                header: RefreshHeader(
+                  color: Colors.indigo,
+                ),
+                footer: RefreshFooter(
+                  color: Colors.indigo,
+                  enableHapticFeedback: false,
+                ),
+                child: CustomScrollView(
+                  slivers: <Widget>[
+                    // 详情view
+                    SliverToBoxAdapter(
+                      child: TopicSubject(state.subject),
                     ),
-                  ),
-                )
-              : SpinKitWave(
-                  color: Color(0xFF999999),
-                  type: SpinKitWaveType.start,
-                  size: 20,
-                ),
-    );
-  }
 
-  Widget detailCard() {
-    return TopicSubject(topic: topic);
-  }
+                    SliverPersistentHeader(
+                      pinned: true,
+                      floating: true,
+                      delegate: SliverPageDelegate(
+                        maxHeight: 40,
+                        minHeight: 40,
+                        child: Row(children: <Widget>[
+                          Container(
+                            margin: const EdgeInsets.only(left: 20),
+                            child: Text('全部回复'),
+                          ),
+                          const Spacer(),
+                          Container(
+                            margin: const EdgeInsets.only(right: 20),
+                            child: Text('页码 ${state.current} / ${state.total}'),
+                          ),
+                        ]),
+                      ),
+                    ),
 
-  Widget pagePersistent() {
-    return items.length == 0
-        ? SliverToBoxAdapter(
-            child: Container(
-              key: globalKey,
-              padding: const EdgeInsets.all(10.0),
-              color: Colors.grey[200],
-              child: Center(
-                child: Text(
-                  '目前尚无回复',
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
-              ),
-            ),
-          )
-        : SliverPersistentHeader(
-            pinned: true,
-            floating: true,
-            delegate: SliverPageDelegate(
-              maxHeight: 40,
-              minHeight: 40,
-              child: Row(children: <Widget>[
-                Container(
-                  margin: const EdgeInsets.only(left: 25),
-                  child: Text('页码 ${topic.current} / ${topic.total}'),
-                ),
-                const Spacer(),
-                FlatButton(
-                  color: Colors.transparent,
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  child: Row(
-                    children: <Widget>[
-                      Text(
-                        reverse ? "倒序" : "正序",
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          color: Theme.of(context).textTheme.body1.color,
+                    // 评论view
+                    SliverToBoxAdapter(
+                      child: Container(
+                        key: globalKey,
+                        color: Colors.white,
+                        child: ListView.separated(
+                          itemCount: state.replies.length - 1,
+                          itemBuilder: (context, index) {
+                            Reply comment = state.replies[index + 1];
+                            return TopicReply(reply: comment);
+                          },
+                          separatorBuilder: (BuildContext context, int index) {
+                            return const Divider(height: 0);
+                          },
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
                         ),
                       ),
-                      Icon(
-                        Icons.swap_vert,
-                        size: 20,
-                        color: Theme.of(context).textTheme.body1.color,
-                      ),
-                    ],
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      reverse = !reverse;
-                      items.clear();
-                    });
-                    _fetchData(reverse ? topic.total : 1);
-                  },
-                )
-              ]),
-            ),
-          );
-  }
-
-  Widget commentCard() {
-    return Container(
-      color: Colors.white,
-      child: ListView.separated(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          Reply comment = items[index];
-          if (index == 0) {
-            return TopicReply(
-              key: globalKey,
-              reply: comment,
-              isAuthor: topic.author == comment.author,
+                    ),
+                  ],
+                  controller: _scrollController,
+                ),
+                onRefresh: () async {
+                  _bloc.add(RefreshEvent(
+                    topicId: widget.topicId,
+                    controller: _refreshController,
+                  ));
+                },
+                onLoad: () async {
+                  _bloc.add(LoadMoreEvent(
+                    topicId: widget.topicId,
+                    controller: _refreshController,
+                  ));
+                },
+                controller: _refreshController,
+                scrollController: _scrollController,
+              ),
             );
           }
-          return TopicReply(
-            reply: comment,
-            isAuthor: topic.author == comment.author,
-          );
         },
-        separatorBuilder: (BuildContext context, int index) {
-          return const Divider(height: 0.0);
-        },
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
       ),
     );
   }

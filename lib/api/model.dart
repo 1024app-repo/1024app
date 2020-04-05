@@ -1,53 +1,35 @@
+import 'package:equatable/equatable.dart';
+
 class Node {
   String id;
   String name;
-  String url;
-  String desc;
-
-  List<Category> categories;
-  List<Topic> topics;
 
   int total = 1;
   int current = 1;
 
-  Node({this.id, this.name, this.url, this.desc, this.categories});
+  Node({this.id, this.name});
 
   @override
   String toString() {
-    return 'Node{name: $name, url: $url}';
+    return 'Node{id: $id, name: $name}';
   }
 }
 
-class Category {
-  String id;
-  final String name;
-  final String url;
-
-  Category({this.id, this.name, this.url});
-
-  @override
-  String toString() {
-    return 'Category{name: $name, url: $url}';
-  }
-}
-
-class Topic {
+// ignore: must_be_immutable
+class Topic extends Equatable {
   String id;
   String title;
   String author;
   String publishTime;
-  bool hot = false;
-  bool prime = false;
-
-  String replier;
   String replyTime;
   String replyCount;
+
+  bool hot = false;
+  bool prime = false;
 
   bool readStatus = false;
 
   Reply subject;
-  List<String> images;
-  List<Reply> replies;
 
   int total = 1;
   int current = 1;
@@ -57,7 +39,6 @@ class Topic {
     this.title,
     this.author,
     this.publishTime,
-    this.replier,
     this.replyTime,
     this.replyCount,
   });
@@ -67,7 +48,6 @@ class Topic {
     this.title = map['title'];
     this.author = map['author'];
     this.publishTime = map['publishTime'];
-    this.replier = map['replier'];
     this.replyTime = map['replyTime'];
     this.replyCount = map['replyCount'];
   }
@@ -78,7 +58,6 @@ class Topic {
     map['title'] = this.title;
     map['author'] = this.author;
     map['publishTime'] = this.publishTime;
-    map['replier'] = this.replier;
     map['replyTime'] = this.replyTime;
     map['replyCount'] = this.replyCount;
     return map;
@@ -86,15 +65,18 @@ class Topic {
 
   @override
   String toString() {
-    return 'Topic{id: $id, title: $title, author: $author,'
-        ' publishTime: $publishTime, replier: $replier, replyTime: $replyTime,'
-        ' replyNum: $replyCount}';
+    return 'Topic {id: $id}';
   }
+
+  @override
+  List<Object> get props => [id, title, author, replyCount];
 }
 
-class Reply {
+// ignore: must_be_immutable
+class Reply extends Equatable {
+  String title;
   final String author;
-  final String avatar;
+//  final String avatar;
   final String level;
   final String content;
   final String time;
@@ -102,7 +84,7 @@ class Reply {
 
   Reply({
     this.author,
-    this.avatar,
+//    this.avatar,
     this.level,
     this.content,
     this.time,
@@ -111,28 +93,20 @@ class Reply {
 
   @override
   String toString() {
-    return 'Detail{author: $author, level: $level, time: $time, floor: $floor}';
-  }
-}
-
-class UserProperty {
-  String prestige;
-  String money;
-  String contribution;
-  String posted;
-
-  UserProperty(this.prestige, this.money, this.contribution, this.posted);
-
-  UserProperty.fromString(String str) {
-    var v = str.split('|');
-    this.prestige = v[0];
-    this.money = v[1];
-    this.contribution = v[2];
-    this.posted = v[3];
+    return 'Reply {title: $title, author: $author, level: $level, time: $time, floor: $floor}';
   }
 
   @override
-  String toString() {
-    return '$prestige|$money|$contribution|$posted';
-  }
+  List<Object> get props => [author, level, content, time, floor];
+}
+
+class Result<T> extends Equatable {
+  final List<T> rows;
+  final int page;
+  final int total;
+
+  const Result({this.rows, this.page, this.total});
+
+  @override
+  List<Object> get props => [rows, page, total];
 }

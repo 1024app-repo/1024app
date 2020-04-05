@@ -46,7 +46,6 @@ class DbHelper {
       title TEXT NOT NULL,
       author TEXT NOT NULL,
       publishTime TEXT NOT NULL,
-      replier TEXT,
       replyTime TEXT,
       replyCount TEXT
     )

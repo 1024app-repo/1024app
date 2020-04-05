@@ -1,6 +1,3 @@
-import 'package:html/dom.dart' as dom;
-import 'package:html/parser.dart' show parse;
-
 import '../util/db_helper.dart';
 import '../util/fetcher.dart';
 import '../util/time_formatter.dart';
@@ -15,31 +12,15 @@ RegExp regContribution = RegExp(r'(?<=貢獻:\s)[^\s]*(?=\s點)');
 RegExp regPosted = RegExp(r'(?<=發帖:\s)[^\s]*');
 
 class API {
-  static Future<List<Node>> getNodes() async {
-    var document = await Fetcher.invoke("index.php");
-
-    List<Node> nodes = List<Node>();
-    document.querySelectorAll(".tr3.f_one").forEach((v) {
-      var e = v.querySelector('h2 > a');
-      nodes.add(Node(
-        id: '',
-        name: e.text,
-        url: e.attributes['href'],
-        desc: v.querySelector('.smalltxt.gray').text,
-        categories: [],
-      ));
-    });
-
-    return nodes;
-  }
-
-  static Future<Node> getNodeDetail(Node node, int page) async {
-    var url = node.url;
+  static Future<Result<Topic>> getTopicList(String nodeId, int page) async {
+    var url = "thread0806.php?fid=$nodeId";
     if (page > 1) {
       url += "&search=&page=$page";
     }
 
-    node.topics = List<Topic>();
+    List<Topic> topics = List<Topic>();
+    var current = 1;
+    var total = 1;
     var document = await Fetcher.invoke(url);
 
     document.querySelectorAll(".tr3.t_one.tac").forEach((v) {
@@ -56,8 +37,6 @@ class API {
               .replaceAll(RegExp(r'］'), ']'),
           author: v.querySelector('.bl').text.trim(),
           publishTime: v.querySelector('.f12').text.trim(),
-          replier:
-              r.parent.text.substring(r.parent.text.indexOf("by:") + 3).trim(),
           replyTime:
               formatTime(DateTime.parse(r.text.trim()).millisecondsSinceEpoch),
           replyCount: r.parent.previousElementSibling.text.trim(),
@@ -72,40 +51,35 @@ class API {
           }
         });
 
-        node.topics.add(topic);
+        topics.add(topic);
       }
     });
 
     var p = document.querySelector(".w70");
     if (p != null) {
       var v = p.querySelector('input').attributes['value'].split('/');
-      node.current = int.parse(v[0]);
-      node.total = int.parse(v[1]);
+      current = int.parse(v[0]);
+      total = int.parse(v[1]);
     }
-    await DbHelper.instance.addReadState(node.topics);
+    await DbHelper.instance.addReadState(topics);
 
-    return node;
+    return Result(rows: topics, page: current, total: total);
   }
 
-  static Future<Topic> getTopicDetail(String topicId, int page) async {
+  static Future<Result<Reply>> getTopicDetail(String topicId, int page) async {
     var url = "read.php?";
-
-    Topic topic = new Topic(id: topicId);
     if (page > 1) {
-      url += "tid=${topic.id}&page=$page";
+      url += "tid=$topicId&page=$page";
     } else {
-      url += "tid=${topic.id}&toread=1";
-      topic.images = List<String>(); // 只在第一页拿图片列表
+      url += "tid=$topicId&toread=1";
+//      topic.images = List<String>(); // 只在第一页拿图片列表
     }
+    print(url);
 
-    topic.replies = List<Reply>();
+    List<Reply> replies = List<Reply>();
+    var current = 1;
+    var total = 1;
     var document = await Fetcher.invoke(url);
-
-    // 解析帖子标题
-    if (page < 2) {
-      topic.title =
-          document.querySelector('a[href="read.php?tid=${topic.id}"]').text;
-    }
 
     // 帖子下的回复内容
     document.querySelectorAll(".t.t2").forEach((v) {
@@ -117,12 +91,6 @@ class API {
       }
       var i = t.text.indexOf("Posted:");
 
-      var u = a.querySelector(".tac > img");
-      var avatar;
-      if (u != null) {
-        avatar = u.attributes["src"].trim();
-      }
-
       var g = regFloor.firstMatch(t.querySelector(".s3").text);
       var floor = g != null ? g.group(0) : "0";
 
@@ -131,7 +99,6 @@ class API {
 
       Reply reply = Reply(
         author: a.querySelector("b").text.trim(),
-        avatar: avatar,
         level: a.querySelector("font").text,
         content: v
             .querySelector(".tpc_content")
@@ -142,31 +109,19 @@ class API {
       );
 
       if (floor == "0") {
-        topic.subject = reply;
-        topic.author = reply.author;
-        topic.publishTime = reply.time;
-
-        List<dom.Element> images = parse(topic.subject.content)
-            .querySelectorAll("input[type='image'],img");
-        if (images != null && images.isNotEmpty) {
-          images.forEach((v) {
-            if (v.attributes["ess-data"] != null) {
-              topic.images.add(v.attributes["ess-data"].trim());
-            }
-          });
-        }
-      } else {
-        topic.replies.add(reply);
+        reply.title =
+            document.querySelector('a[href="read.php?tid=$topicId"]').text;
       }
+      replies.add(reply);
     });
 
     var p = document.querySelector(".w70");
     if (p != null) {
       var v = p.querySelector('input').attributes['value'].split('/');
-      topic.current = int.parse(v[0]);
-      topic.total = int.parse(v[1]);
+      current = int.parse(v[0]);
+      total = int.parse(v[1]);
     }
 
-    return topic;
+    return Result(rows: replies, page: current, total: total);
   }
 }

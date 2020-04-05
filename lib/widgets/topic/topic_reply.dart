@@ -2,19 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../../api/model.dart';
 import '../../util/constants.dart';
-import '../circle_avatar.dart';
+import '../avatar_letter.dart';
 import '../colorful_tag.dart';
 import 'topic_content.dart';
 
 class TopicReply extends StatelessWidget {
   final Reply reply;
-  final bool isAuthor;
 
-  const TopicReply({
-    Key key,
-    this.reply,
-    this.isAuthor,
-  }) : super(key: key);
+  const TopicReply({Key key, this.reply}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,28 +22,13 @@ class TopicReply extends StatelessWidget {
           Column(
             children: <Widget>[
               // 评论item头像
-              CircleAvatarWithPlaceholder(
-                imageUrl: reply.avatar,
-                userName: reply.author,
-                size: 32,
-              ),
-              Offstage(
-                offstage: !isAuthor,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 6.0),
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-                    decoration: BoxDecoration(
-                      color: Colors.redAccent[100],
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                    child: Text(
-                      '樓主',
-                      style: TextStyle(fontSize: 9, color: Colors.white),
-                    ),
-                  ),
-                ),
+              AvatarLetter(
+                size: 35,
+                fontSize: 12,
+                upperCase: true,
+                numberLetters: 1,
+                letterType: LetterType.Circular,
+                text: reply.author,
               ),
             ],
           ),
@@ -72,10 +52,7 @@ class TopicReply extends StatelessWidget {
                               reply.author,
                               textAlign: TextAlign.left,
                               maxLines: 1,
-                              style: TextStyle(
-                                color: Theme.of(context).textTheme.title.color,
-                                fontSize: 14,
-                              ),
+                              style: Theme.of(context).textTheme.subtitle,
                             ),
                             const SizedBox(
                               width: 5,
@@ -113,7 +90,10 @@ class TopicReply extends StatelessWidget {
                   ],
                 ),
                 // 回复内容
-                TopicContent(content: reply.content),
+                TopicContent(
+                  content: reply.content,
+                  viewImage: false,
+                ),
               ],
             ),
           )

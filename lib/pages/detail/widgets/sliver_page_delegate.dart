@@ -21,10 +21,11 @@ class SliverPageDelegate extends SliverPersistentHeaderDelegate {
         color: Colors.transparent,
         child: ClipRect(
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+            filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.grey.shade200.withOpacity(0.5),
+                border: Border.all(color: Colors.grey, width: 0.2),
               ),
               child: child,
             ),

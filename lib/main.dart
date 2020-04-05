@@ -39,6 +39,7 @@ void _initAsync() async {
 
 class MyApp extends StatelessWidget {
   final Widget home;
+  final navigatorKey = GlobalKey<NavigatorState>();
 
   MyApp({this.home}) {
     final router = Router();
@@ -51,8 +52,10 @@ class MyApp extends StatelessWidget {
     return OKToast(
       child: MaterialApp(
         theme: ThemeData(
+          primaryColor: Colors.indigo,
           fontFamily: 'System',
         ),
+        navigatorKey: navigatorKey,
         home: home,
         onGenerateRoute: Application.router.generator,
         localizationsDelegates: const [
