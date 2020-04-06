@@ -15,7 +15,7 @@ jobs:
           java-version: "12.x"
       - uses: subosito/flutter-action@v1.2.0
         with:
-          flutter-version: "v1.12.13+hotfix.9"
+          flutter-version: "1.12.13+hotfix.9"
       - run: flutter pub get
       - run: flutter build apk
       - uses: softprops/action-gh-release@v1
