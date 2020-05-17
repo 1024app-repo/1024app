@@ -29,8 +29,8 @@ List<int> gbkEncoder(String request, RequestOptions options) {
 
 class Fetcher {
   static Future init() async {
-    dio.options.connectTimeout = 5000;
-    dio.options.receiveTimeout = 5000;
+    dio.options.connectTimeout = 15000;
+    dio.options.receiveTimeout = 15000;
     dio.options.baseUrl = BASE_URL;
     dio.options.headers = {
       'user-agent': userAgent,

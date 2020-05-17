@@ -27,8 +27,6 @@ class Topic extends Equatable {
   bool hot = false;
   bool prime = false;
 
-  bool readStatus = false;
-
   Reply subject;
 
   int total = 1;
@@ -76,6 +74,7 @@ class Topic extends Equatable {
 class Reply extends Equatable {
   String title;
   final String author;
+
 //  final String avatar;
   final String level;
   final String content;

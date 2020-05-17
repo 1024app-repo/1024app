@@ -15,6 +15,7 @@ class TopicReply extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(10.0),
+      color: Theme.of(context).cardColor,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -52,7 +53,7 @@ class TopicReply extends StatelessWidget {
                               reply.author,
                               textAlign: TextAlign.left,
                               maxLines: 1,
-                              style: Theme.of(context).textTheme.subtitle,
+                              style: Theme.of(context).textTheme.subtitle2,
                             ),
                             const SizedBox(
                               width: 5,
@@ -70,7 +71,7 @@ class TopicReply extends StatelessWidget {
                             Text(
                               reply.time.trim(),
                               style: TextStyle(
-                                color: Theme.of(context).disabledColor,
+                                color: Theme.of(context).hintColor,
                                 fontSize: 12,
                               ),
                             )

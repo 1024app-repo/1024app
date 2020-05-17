@@ -1,9 +1,9 @@
-import '../util/db_helper.dart';
 import '../util/fetcher.dart';
 import '../util/time_formatter.dart';
 import 'model.dart';
 
-RegExp regId = RegExp(r"[1-9]\d*");
+RegExp regNodeId = RegExp(r"(?<=fid=)([1-9]\d*)");
+RegExp regTopicId = RegExp(r"[1-9]\d*");
 RegExp regFloor = RegExp(r'\d+');
 RegExp regLevel = RegExp(r'(?<=會員頭銜:\s)[^\s]*');
 RegExp regPrestige = RegExp(r'(?<=威望:\s)[^\s]*(?=\s點)');
@@ -12,6 +12,24 @@ RegExp regContribution = RegExp(r'(?<=貢獻:\s)[^\s]*(?=\s點)');
 RegExp regPosted = RegExp(r'(?<=發帖:\s)[^\s]*');
 
 class API {
+  static Future<List<Node>> getNodeList() async {
+    var document = await Fetcher.invoke("index.php");
+
+    List<Node> nodes = List<Node>();
+    document.querySelectorAll(".tr3.f_one").forEach((v) {
+      var e = v.querySelector('h2 > a');
+      var nodeId = regNodeId.allMatches(e.attributes['href']).last.group(0);
+      if (nodeId != '10') {
+        nodes.add(Node(
+          id: nodeId,
+          name: e.text,
+        ));
+      }
+    });
+
+    return nodes;
+  }
+
   static Future<Result<Topic>> getTopicList(String nodeId, int page) async {
     var url = "thread0806.php?fid=$nodeId";
     if (page > 1) {
@@ -30,7 +48,7 @@ class API {
 
       if (r != null) {
         Topic topic = Topic(
-          id: regId.allMatches(h).last.group(0),
+          id: regTopicId.allMatches(h).last.group(0),
           title: t.text
               .replaceAll(RegExp(r'\s+'), "")
               .replaceAll(RegExp(r'\［'), '[')
@@ -61,7 +79,6 @@ class API {
       current = int.parse(v[0]);
       total = int.parse(v[1]);
     }
-    await DbHelper.instance.addReadState(topics);
 
     return Result(rows: topics, page: current, total: total);
   }

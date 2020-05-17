@@ -1,16 +1,16 @@
+import 'package:communityfor1024/api/model.dart';
 import 'package:communityfor1024/blocs/detail/bloc.dart';
-import 'package:communityfor1024/pages/detail/widgets/sliver_page_delegate.dart';
+import 'package:communityfor1024/util/db_helper.dart';
 import 'package:communityfor1024/widgets/app_bar.dart';
+import 'package:communityfor1024/widgets/error/error.dart';
+import 'package:communityfor1024/widgets/refresh_indicator.dart';
+import 'package:communityfor1024/widgets/sliver_page_delegate.dart';
+import 'package:communityfor1024/widgets/topic/topic_reply.dart';
+import 'package:communityfor1024/widgets/topic/topic_subject.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-
-import '../../../api/model.dart';
-import '../../../widgets/error/error.dart';
-import '../../../widgets/refresh_indicator.dart';
-import '../../../widgets/topic/topic_reply.dart';
-import '../../../widgets/topic/topic_subject.dart';
 
 class TopicDetailPage extends StatefulWidget {
   final String topicId;
@@ -27,6 +27,9 @@ class TopicDetailPageState extends State<TopicDetailPage> {
   ScrollController _scrollController = new ScrollController();
   EasyRefreshController _refreshController;
   TopicDetailBloc _bloc;
+
+  var dbHelper = DbHelper.instance;
+  Topic topic;
 
   @override
   void initState() {
@@ -56,7 +59,7 @@ class TopicDetailPageState extends State<TopicDetailPage> {
         builder: (context, state) {
           if (state is TopicDetailUninitialized) {
             return SpinKitWave(
-              color: Colors.indigo,
+              color: Color(0xFF808080),
               type: SpinKitWaveType.start,
               size: 20,
             );
@@ -75,10 +78,10 @@ class TopicDetailPageState extends State<TopicDetailPage> {
                 enableControlFinishRefresh: true,
                 enableControlFinishLoad: true,
                 header: RefreshHeader(
-                  color: Colors.indigo,
+                  color: Color(0xFF808080),
                 ),
                 footer: RefreshFooter(
-                  color: Colors.indigo,
+                  color: Color(0xFF808080),
                   enableHapticFeedback: false,
                 ),
                 child: CustomScrollView(
@@ -112,7 +115,7 @@ class TopicDetailPageState extends State<TopicDetailPage> {
                     SliverToBoxAdapter(
                       child: Container(
                         key: globalKey,
-                        color: Colors.white,
+//                        color: Colors.white,
                         child: ListView.separated(
                           itemCount: state.replies.length - 1,
                           itemBuilder: (context, index) {
@@ -120,7 +123,11 @@ class TopicDetailPageState extends State<TopicDetailPage> {
                             return TopicReply(reply: comment);
                           },
                           separatorBuilder: (BuildContext context, int index) {
-                            return const Divider(height: 0);
+                            return const Divider(
+                              height: 0,
+                              indent: 10,
+                              endIndent: 10,
+                            );
                           },
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),

@@ -1,8 +1,5 @@
-import 'package:communityfor1024/blocs/detail/bloc.dart';
-import 'package:communityfor1024/pages/detail/page/topic_detail_page.dart';
-import 'package:communityfor1024/util/db_helper.dart';
+import 'package:communityfor1024/widgets/topic/topic_detail.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../api/model.dart';
 import '../avatar_letter.dart';
@@ -15,27 +12,19 @@ class TopicItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('TopicItem:' + topic.id);
-
+    print('build topic item ${topic.id}');
     return InkWell(
       onTap: () {
-        topic.readStatus = true;
-        DbHelper.instance.insert(topic);
-        final page = BlocProvider(
-          create: (_) => TopicDetailBloc(),
-          child: TopicDetailPage(topic.id),
-        );
         Navigator.push(
           context,
           new MaterialPageRoute(
-            builder: (context) => page,
+            builder: (context) => TopicDetail(topic: topic),
           ),
         );
-//        return;
       },
       child: Container(
         padding: const EdgeInsets.all(20),
-        color: topic.readStatus ? Color(0xFFEDE7F6) : Colors.transparent,
+        color: Theme.of(context).cardColor,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -44,7 +33,7 @@ class TopicItem extends StatelessWidget {
               topic.title,
               style: TextStyle(
                 fontSize: 16,
-                color: Theme.of(context).textTheme.title.color,
+                color: Theme.of(context).textTheme.headline6.color,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -83,7 +72,7 @@ class TopicItemMetadata extends StatelessWidget {
           textAlign: TextAlign.left,
           style: new TextStyle(
             fontSize: 13.0,
-            color: Theme.of(context).textTheme.title.color,
+            color: Theme.of(context).textTheme.headline6.color,
           ),
         ),
         const SizedBox(width: 5),
@@ -91,7 +80,7 @@ class TopicItemMetadata extends StatelessWidget {
           "${topic.replyTime}",
           style: TextStyle(
             fontSize: 13.0,
-            color: Theme.of(context).disabledColor,
+            color: Theme.of(context).hintColor,
           ),
         ),
         const SizedBox(width: 5),
@@ -128,7 +117,7 @@ class TopicItemMetadata extends StatelessWidget {
           child: Text(
             topic.replyCount,
             style: TextStyle(
-              color: Theme.of(context).disabledColor,
+              color: Theme.of(context).hintColor,
               fontSize: 13,
             ),
           ),

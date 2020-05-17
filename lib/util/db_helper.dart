@@ -48,19 +48,33 @@ class DbHelper {
       publishTime TEXT NOT NULL,
       replyTime TEXT,
       replyCount TEXT
-    )
+    );
     ''');
   }
 
   Future<int> insert(Topic topic) async {
     Database db = await instance.database;
-    if (await queryTopic(topic.id) != null) {
-      delete(topic.id);
+
+    if (await query(topic.id) != null) {
+      return await update(topic);
     }
     return await db.insert(table, topic.toMap());
   }
 
-  Future<Topic> queryTopic(String topicId) async {
+  Future<int> deleteAll() async {
+    Database db = await instance.database;
+    return await db.delete(table);
+  }
+
+  Future<List<Topic>> queryAll() async {
+    Database db = await instance.database;
+    var mapList = await db.query(table);
+    List<Topic> topicList = List<Topic>();
+    mapList.forEach((map) => topicList.insert(0, Topic.fromMap(map)));
+    return topicList;
+  }
+
+  Future<Topic> query(String topicId) async {
     Database db = await instance.database;
     List<Map<String, dynamic>> result =
         await db.query(table, where: 'topicId = ?', whereArgs: [topicId]);
@@ -72,41 +86,9 @@ class DbHelper {
     return null;
   }
 
-  Future<List<Topic>> addReadState(List<Topic> list) async {
-    for (var topic in list) {
-      if (await queryTopic(topic.id) != null) {
-        topic.readStatus = true;
-      }
-    }
-    return list;
-  }
-
-  Future<List<Map<String, dynamic>>> queryAllRows() async {
-    Database db = await instance.database;
-    return await db.query(table);
-  }
-
-  Future<List<Topic>> getRecentReadTopics() async {
-    var mapList = await queryAllRows();
-    List<Topic> topicList = List<Topic>();
-    mapList.forEach((map) => topicList.insert(0, Topic.fromMap(map)));
-    print("当前数据库共有${topicList.length}条记录");
-    return topicList;
-  }
-
-  Future<int> deleteAll() async {
-    Database db = await instance.database;
-    return await db.delete(table);
-  }
-
   Future<int> update(Topic topic) async {
     Database db = await instance.database;
     return await db.update(table, topic.toMap(),
         where: 'topicId = ?', whereArgs: [topic.id]);
-  }
-
-  Future<int> delete(String topicId) async {
-    Database db = await instance.database;
-    return await db.delete(table, where: 'topicId = ?', whereArgs: [topicId]);
   }
 }

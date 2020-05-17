@@ -1,5 +1,6 @@
 import 'package:communityfor1024/blocs/list/bloc.dart';
 import 'package:communityfor1024/util/event_bus.dart';
+import 'package:communityfor1024/widgets/topic/topic_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
@@ -8,7 +9,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../../api/model.dart';
 import '../../widgets/error/error.dart';
 import '../refresh_indicator.dart';
-import 'topic_item.dart';
 
 class TopicListView extends StatefulWidget {
   final String nodeId;
@@ -50,7 +50,7 @@ class TopicListViewState extends State<TopicListView> {
       builder: (context, state) {
         if (state is TopicListUninitialized) {
           return SpinKitWave(
-            color: Colors.indigo,
+            color: Color(0xFF808080),
             type: SpinKitWaveType.start,
             size: 20,
           );
@@ -109,10 +109,10 @@ class TopicList extends StatelessWidget {
   Widget build(BuildContext context) {
     return EasyRefresh(
       header: RefreshHeader(
-        color: Colors.indigo,
+        color: Color(0xFF808080),
       ),
       footer: RefreshFooter(
-        color: Colors.indigo,
+        color: Color(0xFF808080),
         enableHapticFeedback: false,
       ),
       enableControlFinishRefresh: true,
@@ -123,7 +123,11 @@ class TopicList extends StatelessWidget {
           return TopicItem(topic: items[index]);
         },
         separatorBuilder: (BuildContext context, int index) {
-          return const Divider(height: 0);
+          return const Divider(
+            height: 0,
+            indent: 20,
+            endIndent: 20,
+          );
         },
         itemCount: items.length,
         cacheExtent: 250,

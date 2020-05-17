@@ -1,21 +1,19 @@
 import 'dart:io';
 
-import 'package:fluro/fluro.dart';
+import 'package:communityfor1024/api/api.dart';
+import 'package:communityfor1024/api/model.dart';
+import 'package:communityfor1024/blocs/theme/bloc.dart';
+import 'package:communityfor1024/pages/index.dart';
+import 'package:communityfor1024/util/fetcher.dart';
+import 'package:communityfor1024/util/sp_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:oktoast/oktoast.dart';
-
-import 'routers/routers.dart';
-import 'util/fetcher.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  const maxBytes = 768 * (1 << 20);
-  // Invoke both method names to ensure the correct one gets invoked.
-  SystemChannels.skia.invokeMethod('setResourceCacheMaxBytes', maxBytes);
-  SystemChannels.skia.invokeMethod('Skia.setResourceCacheMaxBytes', maxBytes);
-
   // 强制竖屏
   SystemChrome.setPreferredOrientations(
     [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown],
@@ -28,46 +26,41 @@ void main() async {
     SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
   }
 
-  _initAsync();
+  await _initAsync();
 
   return runApp(MyApp());
 }
 
-void _initAsync() async {
+List<Node> nodes;
+int initialIndex;
+
+Future _initAsync() async {
+  SpHelper.sp = await SharedPreferences.getInstance();
   await Fetcher.init();
+  nodes = await API.getNodeList();
+  initialIndex = nodes.indexWhere((Node e) => e.id == '7');
 }
 
 class MyApp extends StatelessWidget {
-  final Widget home;
-  final navigatorKey = GlobalKey<NavigatorState>();
-
-  MyApp({this.home}) {
-    final router = Router();
-    Routes.configureRoutes(router);
-    Application.router = router;
-  }
-
   @override
   Widget build(BuildContext context) {
-    return OKToast(
-      child: MaterialApp(
-        theme: ThemeData(
-          primaryColor: Colors.indigo,
-          fontFamily: 'System',
-        ),
-        navigatorKey: navigatorKey,
-        home: home,
-        onGenerateRoute: Application.router.generator,
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: const [Locale('zh', 'CH'), Locale('en', 'US')],
+    return BlocProvider<ThemeBloc>(
+      create: (_) => ThemeBloc(),
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, state) {
+          return MaterialApp(
+            home: IndexPage(nodes, initialIndex),
+            theme: state.getTheme(),
+            themeMode: SpHelper.getThemeMode(),
+            darkTheme: state.getTheme(isDark: true),
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('zh', 'CH')],
+          );
+        },
       ),
-      backgroundColor: Colors.grey[800],
-      textPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-      radius: 20.0,
-      position: ToastPosition.bottom,
     );
   }
 }

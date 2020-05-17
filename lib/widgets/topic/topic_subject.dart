@@ -15,9 +15,10 @@ class TopicSubject extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('render TopicSubject');
     return Container(
       padding: const EdgeInsets.all(10),
-      color: Colors.white,
+      color: Theme.of(context).cardColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -25,7 +26,7 @@ class TopicSubject extends StatelessWidget {
           Text(
             subject.title,
             softWrap: true,
-            style: Theme.of(context).textTheme.title,
+            style: Theme.of(context).textTheme.headline6,
           ),
           Container(
             padding: const EdgeInsets.symmetric(vertical: 10),
@@ -53,7 +54,7 @@ class TopicSubject extends StatelessWidget {
                               subject.author,
                               textAlign: TextAlign.left,
                               maxLines: 1,
-                              style: Theme.of(context).textTheme.subtitle,
+                              style: Theme.of(context).textTheme.subtitle2,
                             ),
                           ),
                           const SizedBox(
@@ -73,7 +74,7 @@ class TopicSubject extends StatelessWidget {
                             child: Text(
                               subject.time,
                               style: TextStyle(
-                                color: Theme.of(context).disabledColor,
+                                color: Theme.of(context).hintColor,
                                 fontSize: 13,
                               ),
                             ),

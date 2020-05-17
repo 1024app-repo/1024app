@@ -14,7 +14,10 @@ class ColorfulTag extends StatelessWidget {
       padding: const EdgeInsets.only(left: 2.0, right: 2.0),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-        decoration: BoxDecoration(color: color),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(2),
+        ),
         child: Text(
           title,
           style: TextStyle(

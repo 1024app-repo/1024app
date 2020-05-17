@@ -1,5 +1,5 @@
 import 'package:communityfor1024/blocs/detail/bloc.dart';
-import 'package:communityfor1024/pages/detail/page/topic_detail_page.dart';
+import 'package:communityfor1024/pages/topic_detail_page.dart';
 import 'package:communityfor1024/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,7 +18,7 @@ class TopicContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final kHTML = content.replaceAll('ess-data', 'data-src');
     final defaultStyle = DefaultTextStyle.of(context).style;
-    final textStyle = defaultStyle.copyWith(fontSize: 15);
+    final textStyle = defaultStyle.copyWith(fontSize: 16);
 
     return HtmlWidget(
       kHTML,

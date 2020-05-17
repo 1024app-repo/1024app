@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:oktoast/oktoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -92,10 +91,8 @@ Future<Null> clearCache() async {
     //删除缓存目录
     await delDir(tempDir);
     await loadCache();
-    showToast('清除缓存成功');
   } catch (e) {
     print(e);
-    showToast('清除缓存失败');
   } finally {
     //此处隐藏加载loading
   }
@@ -120,4 +117,8 @@ String buildQueryString(Map data) {
   var s = [];
   data.forEach((k, v) => s.add('$k=$v'));
   return s.join('&');
+}
+
+isDarkMode(BuildContext context) {
+  return Theme.of(context).brightness == Brightness.dark;
 }

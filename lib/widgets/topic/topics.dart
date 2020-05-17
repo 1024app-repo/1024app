@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../api/model.dart';
-import '../app_bar.dart';
 import 'topic_list.dart';
 
 class TopicsView extends StatelessWidget {
@@ -12,7 +11,6 @@ class TopicsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppBar(title: node.name),
       body: TopicListView(nodeId: node.id),
     );
   }

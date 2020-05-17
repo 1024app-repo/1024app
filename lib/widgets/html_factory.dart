@@ -85,7 +85,7 @@ class HtmlWidgetFactory extends WidgetFactory {
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4.0),
-            color: Colors.grey[300],
+            color: Theme.of(context).primaryColor,
           ),
           child: widget,
         ),

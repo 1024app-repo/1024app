@@ -1,26 +1,13 @@
-import 'package:communityfor1024/api/model.dart';
 import 'package:flutter/material.dart';
 
 const BASE_URL = 'http://www.t66y.com';
 
-var nodes = [
-  Node(
-    id: '7',
-    name: "技术讨论区",
-  ),
-  Node(
-    id: '8',
-    name: "新时代的我们",
-  ),
-  Node(
-    id: '16',
-    name: "达盖儿的旗帜",
-  ),
-  Node(
-    id: '20',
-    name: "成人文学交流区",
-  ),
-];
+const THEME_MODE_SYSTEM = 'system';
+const THEME_MODE_LIGHT = 'light';
+const THEME_MODE_DARK = 'dark';
+
+const SP_THEME_MODE = 'darkMode';
+const SP_IMAGE_OPTIMIZE_MODE = 'imageOptimizeMode';
 
 final colourLevel = {
   '總版主 ( 4 )': Colors.amber[600],
