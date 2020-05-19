@@ -4,7 +4,7 @@ import 'model.dart';
 
 RegExp regNodeId = RegExp(r"(?<=fid=)([1-9]\d*)");
 RegExp regTopicId = RegExp(r"[1-9]\d*");
-RegExp regFloor = RegExp(r'\d+');
+RegExp regFloor = RegExp(r"(?<=',')(\d+)(?=',')");
 RegExp regLevel = RegExp(r'(?<=會員頭銜:\s)[^\s]*');
 RegExp regPrestige = RegExp(r'(?<=威望:\s)[^\s]*(?=\s點)');
 RegExp regMoney = RegExp(r'(?<=金錢:\s)[^\s]*(?=\sUSD)');
@@ -108,7 +108,9 @@ class API {
       }
       var i = t.text.indexOf("Posted:");
 
-      var g = regFloor.firstMatch(t.querySelector(".s3").text);
+      // 从 onclick 中获取楼层，2020.5.19 fixed
+      var g = regFloor
+          .firstMatch(t.querySelectorAll('a').last.attributes['onclick']);
       var floor = g != null ? g.group(0) : "0";
 
       // 回帖的时间缺少秒，这边拼上00
